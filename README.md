@@ -1,2 +1,0 @@
-# origo-server
-Origo server
