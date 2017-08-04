@@ -1,10 +1,13 @@
 var orm = require('orm');
+origoConfig = require('../conf/config');
 
 module.exports = function(options) {
   // return function(req, res, next) {
   // Implement the middleware function based on the options object
+  var connetionString = 'sqlite:' + origoConfig.adminDataBase.relativePath;
 
-  return orm.express("sqlite://C:/Users/imta/Sundsvall/OrigoDataBase/OrigoDataBase.db", {
+  // return orm.express("sqlite://C:/Users/imta/Sundsvall/OrigoDataBase/OrigoDataBase.db", {
+  return orm.express(connetionString, {
 
     define: function(db, models, next) {
       var Group = db.define("groups", {

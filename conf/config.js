@@ -23,5 +23,8 @@ module.exports = {
   },
   mapState: {
     'absolutePathStorage': 'C:/origoMapState'
+  }, 
+  adminDataBase: {
+  	'relativePath' : 'C:/Users/imta/Sundsvall/OrigoDataBase/OrigoDataBase.db'
   }
 }
