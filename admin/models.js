@@ -4,7 +4,7 @@ module.exports = function(options) {
   // return function(req, res, next) {
   // Implement the middleware function based on the options object
 
-  return orm.express("sqlite://C:/Users/imta/Sundsvall/OrigoClient/src/server/OrigoDataBase.db", {
+  return orm.express("sqlite://C:/Users/imta/Sundsvall/OrigoDataBase/OrigoDataBase.db", {
 
     define: function(db, models, next) {
       var Group = db.define("groups", {
