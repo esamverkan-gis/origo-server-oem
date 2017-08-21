@@ -38,6 +38,17 @@ configRouter.get('/', function(req, res) {
     res.sendStatus(400);
 });
 
+configRouter.post('/', function(req, res) {
+  const newConfig = req.body;
+  req.models.Config.create(newConfig, function(err, config) {
+    if (err) {
+      console.log(err.message);
+      res.status(500).send(err.message);
+    } else
+      res.status(201).send('New config saved with id : ' + config.id);
+  });
+});
+
 configRouter.route('/:id')
   .all(function(req, res, next) {
     // runs for all HTTP verbs first
@@ -53,7 +64,7 @@ configRouter.route('/:id')
     });
   })
   .put(function(req, res, next) {
-    var newConfig = req.body;
+    let newConfig = req.body;
     req.models.Config.get(req.params.id, function(err, config) {
       if (!config) res.sendStatus(404);
       else {
@@ -66,10 +77,7 @@ configRouter.route('/:id')
     })
   })
   .post(function(req, res, next) {
-    console.log('config -- post ');
-    res.json('config -- post');
-
-    // next(new Error('not implemented'));
+    res.sendStatus(400);
   })
   .delete(function(req, res, next) {
     req.models.Config.get(req.params.id, function(err, config) {

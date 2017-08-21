@@ -38,6 +38,17 @@ groupRouter.get('/', function(req, res) {
     res.sendStatus(400);
 });
 
+groupRouter.post('/', function(req, res) {
+  const newGroup = req.body;
+  req.models.Group.create(newGroup, function(err, group) {
+    if (err) {
+      console.log(err.message);
+      res.status(500).send(err.message);
+    } else
+      res.status(201).send('New group saved with id : ' + group.id);
+  });
+});
+
 groupRouter.route('/:id')
   .all(function(req, res, next) {
     // runs for all HTTP verbs first
@@ -53,13 +64,14 @@ groupRouter.route('/:id')
           // config id for this group is available here. (ready for later use!)
           res.status(200).json(groups);
         }).catch(function() {
+          // even if promise for finding the config is rejected, we are still interested in groups, so we return them anyway!
           res.status(200).json(groups);
         });
       }
     });
   })
   .put(function(req, res, next) {
-    var newGroup = req.body;
+    let newGroup = req.body;
     req.models.Group.get(req.params.id, function(err, group) {
       if (!group) res.sendStatus(404);
       else {
@@ -72,7 +84,7 @@ groupRouter.route('/:id')
     })
   })
   .post(function(req, res, next) {
-    next(new Error('not implemented'));
+    res.sendStatus(400);
   })
   .delete(function(req, res, next) {
     req.models.Group.get(req.params.id, function(err, group) {
