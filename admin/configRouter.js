@@ -7,15 +7,16 @@ var _ = require('lodash');
 
 //*************************************************************************CRUD config************************************************************************
 // req.models is a reference to models that ar defined in models.js and used as a middleware in admin.js
-configRouter.route('/').all(function(req, res, next) {
-     // runs for all HTTP verbs first
+configRouter.route('/')
+  .all(function(req, res, next) {
+    // runs for all HTTP verbs first
     // think of it as route specific middleware!
     next();
   })
-  .options(function(req, res, next){
+  .options(function(req, res, next) {
     res.sendStatus(200);
-  })  
-  .get(function(req, res, next){
+  })
+  .get(function(req, res, next) {
     var configName = req.query.name;
     var searchStr = req.query.search;
     // OBS! name=someName takes precedence over search, if name query exists search will have no effect
@@ -45,26 +46,19 @@ configRouter.route('/').all(function(req, res, next) {
     else
       res.sendStatus(400);
   })
-  .post(function(req, res, next){
-    var newConfig = req.body;
+  .post(function(req, res) {
+    const newConfig = req.body;
     console.log('POST config -- Saving new conig');
-    req.models.Config.create(newConfig, function(err, createdConfig) {
-			if (err) throw res.sendStatus(500);
-      res.json(createdConfig);
-      res.status(200);
+    req.models.Config.create(newConfig, function(err, config) {
+      if (err) {
+        console.log(err.message);
+        res.status(500).send(err.message);
+      } else {
+        concole.log('New config saved with id : ' + config.id);
+        res.status(201).json(config);
+      }
     });
   });
-
-configRouter.post('/', function(req, res) {
-  const newConfig = req.body;
-  req.models.Config.create(newConfig, function(err, config) {
-    if (err) {
-      console.log(err.message);
-      res.status(500).send(err.message);
-    } else
-      res.status(201).send('New config saved with id : ' + config.id);
-  });
-});
 
 configRouter.route('/:id')
   .all(function(req, res, next) {
@@ -72,9 +66,9 @@ configRouter.route('/:id')
     // think of it as route specific middleware!
     next();
   })
-  .options(function(req, res, next){
+  .options(function(req, res, next) {
     res.sendStatus(200);
-  })  
+  })
   .get(function(req, res, next) {
     req.models.Config.find({ id: req.params.id }, function(err, configs) {
       if (configs.length == 0)

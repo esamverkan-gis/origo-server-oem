@@ -7,12 +7,12 @@ var createStyleObject = require('./createStyleObject');
 
 var importConfigByOrm = function(req, res) {
   console.log(req.files);
-  if(req.files){
-    fs.readFile(req.files.file1.path, function (err, data) {
+  if (req.files) {
+    fs.readFile(req.files.file1.path, function(err, data) {
       req.body = data;
       importJsonData(req, res);
     });
-  }else{
+  } else {
     importJsonData(req, res);
   }
 };

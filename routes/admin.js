@@ -55,6 +55,7 @@ adminRouter.use('/layer', layerRouter);
 //*********************************************************************ExportConfig********************************************************************
 // read data from database and create index.json 
 var exportConfigByOrmHandler = require('../admin/handlers/exportConfigByOrmHandler');
+// adminRouter.get('/exportConfig/:configName', exportConfigByOrmHandler);
 adminRouter.get('/exportConfig/:configId', exportConfigByOrmHandler);
 
 //********************************************************************importConfig********************************************************************************
