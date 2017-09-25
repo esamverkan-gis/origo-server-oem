@@ -1,7 +1,8 @@
 // This module reads a conifg from database and creates a full index.json
 
 "use strict";
-
+var express = require('express');
+var fileupload = require("express-fileupload");
 var orm = require('orm');
 
 var exportConfigByOrm = function(req, res) {
@@ -16,7 +17,7 @@ var exportConfigByOrm = function(req, res) {
   var Proj4Defs = req.models.Proj4Defs;
   var Style = req.models.Style;
 
-  var configName = req.params["configName"];
+  var configId = req.params["configId"];
   var configId;
   var index = {};
   index.controls = [];
@@ -30,7 +31,7 @@ var exportConfigByOrm = function(req, res) {
   var stylesMap = new Map();
 
   var configPromise = new Promise(function(resolve, reject) {
-    Config.find({ name: configName }, function(err, rows) {
+    Config.find({ id: configId }, function(err, rows) {
       if (rows.length == 0) {
         res.end('No config for this name was found.');
         return;
@@ -159,6 +160,8 @@ var exportConfigByOrm = function(req, res) {
       console.log('Number of sources  : ' + sourcesMap.size);
       console.log('Number of styles   : ' + stylesMap.size);
       console.log('done!');
+      res.setHeader('Content-disposition', 'attachment; filename=index.json');
+      res.setHeader('Content-type', 'application/json');  
       res.status(200).json(index);
     }).catch(function(error) {
       console.log(error);

@@ -25,6 +25,6 @@ module.exports = {
     'absolutePathStorage': 'C:/origoMapState'
   }, 
   adminDataBase: {
-  	'relativePath' : 'C:/Users/imta/Sundsvall/OrigoDataBase/OrigoDataBase.db'
+  	'relativePath' : 'C:/tmp/OrigoMap/OrigoServer/OrigoDataBase.db'
   }
 }

@@ -2,6 +2,11 @@
 
 var express = require('express');
 var adminRouter = express.Router();
+const fileUpload = require('express-fileupload');
+const app = express();
+ 
+// default options 
+adminRouter.use(fileUpload());
 // var orm = require('orm');
 // models are defined in models.js and used as a middleware for all queries that come through "/admin".
 // models are available for handlers on req.models
@@ -14,6 +19,24 @@ var layerRouter = require('../admin/layerRouter.js');
 
 // loading models for orm, options are arbitrary
 adminRouter.use(models({ /*option1: '1', option2: '2' */ }));
+adminRouter.use(function (req, res, next) {
+
+    // Website you wish to allow to connect
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    // Request methods you wish to allow
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+    // Request headers you wish to allow
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+
+    // Set to true if you need the website to include cookies in the requests sent
+    // to the API (e.g. in case you use sessions)
+    res.setHeader('Access-Control-Allow-Credentials', true);
+
+    // Pass to next layer of middleware
+    next();
+});
 
 // handlers 
 // a handler is just a function that takes req, res and handles it!
@@ -31,7 +54,7 @@ adminRouter.use('/layer', layerRouter);
 //*********************************************************************ExportConfig********************************************************************
 // read data from database and create index.json 
 var exportConfigByOrmHandler = require('../admin/handlers/exportConfigByOrmHandler');
-adminRouter.get('/exportConfig/:configName', exportConfigByOrmHandler);
+adminRouter.get('/exportConfig/:configId', exportConfigByOrmHandler);
 
 //********************************************************************importConfig********************************************************************************
 // read the index.json from body, form the corresponding objects and save them in the database

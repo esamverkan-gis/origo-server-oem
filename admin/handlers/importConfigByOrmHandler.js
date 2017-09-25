@@ -6,7 +6,18 @@ var orm = require('orm');
 var createStyleObject = require('./createStyleObject');
 
 var importConfigByOrm = function(req, res) {
+  console.log(req.files);
+  if(req.files){
+    fs.readFile(req.files.file1.path, function (err, data) {
+      req.body = data;
+      importJsonData(req, res);
+    });
+  }else{
+    importJsonData(req, res);
+  }
+};
 
+function importJsonData(req, res) {
   // return new Promise(function(resolve, reject) {
 
   var Group = req.models.Group;
@@ -28,6 +39,7 @@ var importConfigByOrm = function(req, res) {
   var sources = index.source;
 
   var config_name = index.configName;
+  console.log(index);
   if (!config_name) {
     console.log('configuration must have a name as "configName" : "name" ');
     res.end('configuration must have a name as "configName" . "name" ');
