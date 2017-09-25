@@ -213,7 +213,6 @@ module.exports = function(options) {
       models.Style = Style;
       models.db = db;
 
-      console.log('from admin Router');
       next();
     }
   })

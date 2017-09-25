@@ -38,6 +38,17 @@ layerRouter.get('/', function(req, res) {
     res.sendStatus(400);
 });
 
+layerRouter.post('/', function(req, res) {
+  const newLayer = req.body;
+  req.models.Layer.create(newLayer, function(err, layer) {
+    if (err) {
+      console.log(err.message);
+      res.status(500).send(err.message);
+    } else
+      res.status(201).send('New layer saved with id : ' + layer.id);
+  });
+});
+
 layerRouter.route('/:id')
   .all(function(req, res, next) {
     // runs for all HTTP verbs first
@@ -54,7 +65,7 @@ layerRouter.route('/:id')
     });
   })
   .put(function(req, res, next) {
-    var newLayer = req.body;
+    let newLayer = req.body;
     req.models.Layer.get(req.params.id, function(err, layer) {
       if (!layer) res.sendStatus(404);
       else {
@@ -67,7 +78,7 @@ layerRouter.route('/:id')
     })
   })
   .post(function(req, res, next) {
-    next(new Error('not implemented'));
+    res.sendStatus(400);
   })
   .delete(function(req, res, next) {
     req.models.Layer.get(req.params.id, function(err, layer) {

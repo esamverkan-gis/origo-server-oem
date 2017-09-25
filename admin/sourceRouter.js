@@ -38,6 +38,17 @@ sourceRouter.get('/', function(req, res) {
     res.sendStatus(400);
 });
 
+sourceRouter.post('/', function(req, res) {
+  const newSource = req.body;
+  req.models.Source.create(newSource, function(err, source) {
+    if (err) {
+      console.log(err.message);
+      res.status(500).send(err.message);
+    } else
+      res.status(201).send('New source saved with id : ' + source.id);
+  });
+});
+
 sourceRouter.route('/:id')
   .all(function(req, res, next) {
     // runs for all HTTP verbs first
@@ -54,7 +65,7 @@ sourceRouter.route('/:id')
     });
   })
   .put(function(req, res, next) {
-    var newSource = req.body;
+    let newSource = req.body;
     req.models.Source.get(req.params.id, function(err, source) {
       if (!source) res.sendStatus(404);
       else {
@@ -64,10 +75,10 @@ sourceRouter.route('/:id')
           else res.sendStatus(200);
         });
       }
-    })
+    });
   })
   .post(function(req, res, next) {
-    next(new Error('not implemented'));
+    res.sendStatus(400);
   })
   .delete(function(req, res, next) {
     req.models.Source.get(req.params.id, function(err, source) {

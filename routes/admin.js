@@ -7,6 +7,7 @@ const app = express();
  
 // default options 
 adminRouter.use(fileUpload());
+
 // var orm = require('orm');
 // models are defined in models.js and used as a middleware for all queries that come through "/admin".
 // models are available for handlers on req.models
