@@ -34,11 +34,13 @@ module.exports = function(req, response) {
       // for those layers that are not queryable we return an object with name and index 
       var myLayersAttributes = myLayers.map(function(layer, index) {
 
+        // if (layer.queryable) { // here we should ckeck if layer is queryable, if it is then we can use describeFeatureType service to get its attributes
         if (false) {
           var describeFeatureTypeUrl = helperFunctions.fixUrlforDescribeFeaturType(url, layer);
+          // console.log(describeFeatureTypeUrl);
           return helperFunctions.fetchData(describeFeatureTypeUrl);
         } else {
-          console.log('========> ' + index + ' ' + layer.name)
+          // console.log('========> ' + index + ' ' + layer.name)
           return {
             name: layer.name,
             index: index,
@@ -47,8 +49,8 @@ module.exports = function(req, response) {
         }
       });
 
-      // Promise.all takes on array of promises, but here for those layers that are not queryable it has 
-      // an object instead of a promise. in this case it delivers the same object as result. Thesre for 
+      // Promise.all takes an array of promises, but here for those layers that are not queryable it has 
+      // an object instead of a promise. in this case it delivers the same object as result. Therefore 
       // arrayOfAttributes is composed of results of resolved promises(xml) and raw objects
       Promise.all(myLayersAttributes).then(function(arrayOfAttributes) {
 

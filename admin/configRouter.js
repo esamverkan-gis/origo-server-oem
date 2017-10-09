@@ -54,7 +54,7 @@ configRouter.route('/')
         console.log(err.message);
         res.status(500).send(err.message);
       } else {
-        concole.log('New config saved with id : ' + config.id);
+        console.log('New config saved with id : ' + config.id);
         res.status(201).json(config);
       }
     });
@@ -73,8 +73,9 @@ configRouter.route('/:id')
     req.models.Config.find({ id: req.params.id }, function(err, configs) {
       if (configs.length == 0)
         res.sendStatus(404);
-      else
+      else {
         res.status(200).json(configs);
+      }
     });
   })
   .put(function(req, res, next) {
@@ -103,6 +104,5 @@ configRouter.route('/:id')
       });
     });
   });
-
 
 module.exports = configRouter;
