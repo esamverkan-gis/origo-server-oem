@@ -7,6 +7,11 @@ var _ = require('lodash');
 
 //*********************************************************************CRUD source*********************************************************************
 // req.models is a reference to models that ar defined in models.js and used as a middleware in admin.js
+
+sourceRouter.options('/', function(req, res, next) {
+  res.sendStatus(200);
+})
+
 sourceRouter.get('/', function(req, res) {
   var sourceName = req.query.name;
   var searchStr = req.query.search;
@@ -55,6 +60,9 @@ sourceRouter.route('/:id')
     // think of it as route specific middleware!
     next();
   })
+  .options(function(req, res, next) {
+    res.sendStatus(200);
+  })
   .get(function(req, res, next) {
     req.models.Source.find({ id: req.params.id }, function(err, sources) {
       if (sources.length == 0)
@@ -72,7 +80,7 @@ sourceRouter.route('/:id')
         Object.assign(source, newSource);
         source.save(function(err) {
           if (err) res.sendStatus(500);
-          else res.sendStatus(200);
+          else res.status(200).json({});
         });
       }
     });
