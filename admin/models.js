@@ -177,7 +177,6 @@ module.exports = function(options) {
               obj.icon.src = this.icon_source;
             }
             if (styleType == 'image') {
-              7
               obj.image = {};
               obj.image.src = this.image_source;
             }

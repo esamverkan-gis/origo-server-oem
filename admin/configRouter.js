@@ -19,6 +19,8 @@ configRouter.route('/')
   .get(function(req, res, next) {
     var configName = req.query.name;
     var searchStr = req.query.search;
+
+
     // OBS! name=someName takes precedence over search, if name query exists search will have no effect
     if (configName)
       req.models.Config.find({ name: configName }, function(err, configs) {
@@ -48,7 +50,6 @@ configRouter.route('/')
   })
   .post(function(req, res) {
     const newConfig = req.body;
-    console.log('POST config -- Saving new conig');
     req.models.Config.create(newConfig, function(err, config) {
       if (err) {
         console.log(err.message);

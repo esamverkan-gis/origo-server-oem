@@ -48,7 +48,6 @@ sourceRouter.route('/')
   })
   .post(function(req, res) {
     const newSource = req.body;
-    console.log('POST source -- Saving new source');
     req.models.Source.create(newSource, function(err, source) {
       if (err) {
         console.log(err.message);

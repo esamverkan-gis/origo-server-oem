@@ -18,7 +18,7 @@ var exportConfigByOrm = function(req, res) {
 
   // var configName = req.params["configName"];
   var configId = req.params["configId"];
-  var configId;
+  // var configId;
   var index = {};
   index.controls = [];
   index.layers = [];
