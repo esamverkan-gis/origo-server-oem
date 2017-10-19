@@ -40,7 +40,7 @@ layerRouter.route('/')
     // funktion för att hämta alla lager som har en viss konfig
     else if (configId)
       req.models.Layer.find({ config_id: configId }, function(err, layers) {
-        console.log('Number of layers fetched that belong to the configId: ' + configId);
+        console.log('Number of layers fetched that belong to the configId ' + configId + ' = ' + layers.length);
         if (layers.length == 0)
           res.status(404).json({});
         else
