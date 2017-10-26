@@ -17,6 +17,7 @@ var configRouter = require('../admin/configRouter.js');
 var groupRouter = require('../admin/groupRouter.js');
 var sourceRouter = require('../admin/sourceRouter.js');
 var layerRouter = require('../admin/layerRouter.js');
+var attributeRouter = require('../admin/attributeRouter.js');
 
 // loading models for orm, options are arbitrary
 adminRouter.use(models({ /*option1: '1', option2: '2' */ }));
@@ -51,6 +52,7 @@ adminRouter.use('/config', configRouter);
 adminRouter.use('/group', groupRouter);
 adminRouter.use('/source', sourceRouter);
 adminRouter.use('/layer', layerRouter);
+adminRouter.use('/attribute', attributeRouter);
 
 //*********************************************************************ExportConfig********************************************************************
 // read data from database and create index.json 

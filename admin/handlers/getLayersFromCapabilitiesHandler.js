@@ -34,8 +34,8 @@ module.exports = function(req, response) {
       // for those layers that are not queryable we return an object with name and index 
       var myLayersAttributes = myLayers.map(function(layer, index) {
 
-        // if (layer.queryable) { // here we should ckeck if layer is queryable, if it is then we can use describeFeatureType service to get its attributes
-        if (false) {
+        if (layer.queryable) { // here we should ckeck if layer is queryable, if it is then we can use describeFeatureType service to get its attributes
+        // if (false) {
           var describeFeatureTypeUrl = helperFunctions.fixUrlforDescribeFeaturType(url, layer);
           // console.log(describeFeatureTypeUrl);
           return helperFunctions.fetchData(describeFeatureTypeUrl);
