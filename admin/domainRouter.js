@@ -144,7 +144,9 @@ domainRouter.route('/test/:configId')
 
   });
 
-domainRouter.route('/fetchConfigGroups/:configId')
+// this method fetches all groups for a config that has at least one layer.
+// empty groups will not be returned 
+domainRouter.route('/fetchConfigNotEmptyGroups/:configId')
   .all(function (req, res, next) {
     // runs for all HTTP verbs first
     // think of it as route specific middleware!

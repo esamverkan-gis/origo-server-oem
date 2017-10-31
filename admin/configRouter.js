@@ -37,11 +37,12 @@ configRouter.route('/')
       });
     else if (_.isEmpty(req.query))
       req.models.Config.find(function (err, configs) {
-        console.log('Number of all configs fetched : ' + configs.length);
         if (configs.length == 0)
           res.sendStatus(404);
-        else
+        else {
+          console.log('Number of all configs fetched : ' + configs.length);
           res.status(200).json(configs);
+        }
       });
     else
       res.sendStatus(400);
