@@ -39,11 +39,13 @@ function importJsonData(req, res) {
   var sources = index.source;
 
   var config_name = index.configName;
-  console.log(index);
+  
   if (!config_name) {
-    console.log('configuration must have a name as "configName" : "name" ');
-    res.end('configuration must have a name as "configName" . "name" ');
-    return;
+    var date = new Date();
+    var config_name = date.toUTCString();
+    // console.log('configuration must have a name as "configName" : "name" ');
+    // res.end('configuration must have a name as "configName" . "name" ');
+    // return;
   }
   // typeof config_projection_code: string
   // var config_projection_code = Number((index.projectionCode.split(':'))[1]);
@@ -166,7 +168,9 @@ function importJsonData(req, res) {
           title: group.title,
           parent: group.parent,
           expanded: group.expanded,
-          order_number: group.order_number
+          order_number: group.order_number,
+          // this line was added later and is not part of the original db design
+          config_id: config.id
         });
       }
       Group.create(data, function(err, results) {

@@ -38,14 +38,14 @@ groupRouter.route('/')
           res.status(200).json(groups);
       });
     // funktion för att hämta alla grupper som har en viss konfig
-    else if (configId) { }
-    // req.models.Layer.find({ config_id: configId }, function (err, layers) {
-    //   console.log('Number of layers fetched that belong to the configId ' + configId + ' = ' + layers.length);
-    //   if (layers.length == 0)
-    //     res.status(404).json({});
-    //   else
-    //     res.status(200).json(layers);
-    // });
+    else if (configId)
+      req.models.Group.find({ config_id: configId }, function (err, groups) {
+        console.log('Number of groups fetched that belong to the configId ' + configId + ' = ' + groups.length);
+        if (groups.length == 0)
+          res.status(404).json({});
+        else
+          res.status(200).json(groups);
+      });
     else if (_.isEmpty(req.query))
       req.models.Group.find(function (err, groups) {
         console.log('Number of all groups fetched : ' + groups.length);
@@ -65,7 +65,7 @@ groupRouter.route('/')
         res.status(500).send(err.message);
       } else {
         console.log('New group saved with id : ' + group.id);
-        res.status(201).json(group);        
+        res.status(201).json(group);
       }
     });
   });
@@ -97,7 +97,7 @@ groupRouter.route('/:id')
   .put(function (req, res, next) {
     let newGroup = req.body;
     req.models.Group.get(req.params.id, function (err, group) {
-      if (!group) 
+      if (!group)
         res.sendStatus(404);
       else {
         Object.assign(group, newGroup);

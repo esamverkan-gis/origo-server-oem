@@ -15,9 +15,11 @@ module.exports = function(options) {
         title: String,
         parent: Number,
         expanded: Boolean,
-        order_number: Number
+        order_number: Number,
+        config_id: Number
       }, {
         methods: {
+          // This method is supposed to create the corrinsponding json object to be exported to index.json, that's why it does not handle config_id 
           createJsonObject: function() {
             let obj = {};
             obj.name = this.name;
@@ -200,6 +202,7 @@ module.exports = function(options) {
       Layer.hasOne('source', Source);
       Layer.hasOne('style', Style);
       Attribute.hasOne('layer', Layer);
+      Group.hasOne('config', Config);
 
       models.Group = Group;
       models.Layer = Layer;
