@@ -37,11 +37,12 @@ sourceRouter.route('/')
       });
     else if (_.isEmpty(req.query))
       req.models.Source.find(function(err, sources) {
-        console.log('Number of all sources fetched : ' + sources.length);
-        if (sources.length == 0)
+        if (!sources || sources.length == 0)
           res.sendStatus(404);
-        else
+        else{
+          console.log('Number of all sources fetched : ' + sources.length);
           res.status(200).json(sources);
+        }
       });
     else
       res.sendStatus(400);
