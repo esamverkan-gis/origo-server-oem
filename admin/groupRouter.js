@@ -32,7 +32,7 @@ groupRouter.route('/')
     else if (searchStr)
       req.models.Group.find({ name: orm.like("%" + searchStr + "%") }, function (err, groups) {
         if (groups.length == 0)
-        res.sendStatus(404);
+          res.sendStatus(404);
         else {
           console.log('Number of groups fetched that match the search query "' + searchStr + '" : ' + groups.length);
           res.status(200).json(groups);
@@ -42,7 +42,7 @@ groupRouter.route('/')
     else if (configId)
       req.models.Group.find({ config_id: configId }, function (err, groups) {
         if (groups.length == 0)
-        res.status(404).json({});
+          res.status(404).json({});
         else {
           console.log('Number of groups fetched that belong to the configId ' + configId + ' = ' + groups.length);
           res.status(200).json(groups);
@@ -51,7 +51,7 @@ groupRouter.route('/')
     else if (_.isEmpty(req.query))
       req.models.Group.find(function (err, groups) {
         if (groups.length == 0)
-        res.sendStatus(404);
+          res.sendStatus(404);
         else {
           console.log('Number of all groups fetched : ' + groups.length);
           res.status(200).json(groups);

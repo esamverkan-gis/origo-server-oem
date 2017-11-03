@@ -17,6 +17,7 @@ var configRouter = require('../admin/configRouter.js');
 var groupRouter = require('../admin/groupRouter.js');
 var sourceRouter = require('../admin/sourceRouter.js');
 var layerRouter = require('../admin/layerRouter.js');
+var styleRouter = require('../admin/styleRouter.js');
 var attributeRouter = require('../admin/attributeRouter.js');
 var domainRouter = require('../admin/domainRouter.js');
 
@@ -53,6 +54,7 @@ adminRouter.use('/config', configRouter);
 adminRouter.use('/group', groupRouter);
 adminRouter.use('/source', sourceRouter);
 adminRouter.use('/layer', layerRouter);
+adminRouter.use('/style', styleRouter);
 adminRouter.use('/attribute', attributeRouter);
 adminRouter.use('/domain', domainRouter);
 
