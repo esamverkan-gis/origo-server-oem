@@ -3,15 +3,18 @@
 "use strict";
 
 var orm = require('orm');
+var fs = require('fs');
+
 var createStyleObject = require('./createStyleObject');
 
 var importConfigByOrm = function(req, res) {
   console.log(req.files);
   if (req.files) {
-    fs.readFile(req.files.file1.path, function(err, data) {
-      req.body = data;
-      importJsonData(req, res);
-    });
+    //TODO: SANITYCHECK
+    let file1 = req.files.file1;
+    req.body = JSON.parse(file1.data.toString());
+    console.log(req.body);
+    importJsonData(req, res);
   } else {
     importJsonData(req, res);
   }
@@ -39,7 +42,7 @@ function importJsonData(req, res) {
   var sources = index.source;
 
   var config_name = index.configName;
-  
+  console.log(index);
   if (!config_name) {
     var date = new Date();
     var config_name = date.toUTCString();
