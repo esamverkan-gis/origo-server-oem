@@ -20,6 +20,7 @@ var layerRouter = require('../admin/layerRouter.js');
 var styleRouter = require('../admin/styleRouter.js');
 var attributeRouter = require('../admin/attributeRouter.js');
 var domainRouter = require('../admin/domainRouter.js');
+var proj4defsRouter = require('../admin/proj4defsRouter');
 
 // loading models for orm, options are arbitrary
 adminRouter.use(models({ /*option1: '1', option2: '2' */ }));
@@ -56,6 +57,7 @@ adminRouter.use('/source', sourceRouter);
 adminRouter.use('/layer', layerRouter);
 adminRouter.use('/style', styleRouter);
 adminRouter.use('/attribute', attributeRouter);
+adminRouter.use('/proj4defs', proj4defsRouter);
 adminRouter.use('/domain', domainRouter);
 
 //*********************************************************************ExportConfig********************************************************************

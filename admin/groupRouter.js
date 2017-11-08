@@ -41,8 +41,10 @@ groupRouter.route('/')
     // funktion för att hämta alla grupper som har en viss konfig
     else if (configId)
       req.models.Group.find({ config_id: configId }, function (err, groups) {
-        if (groups.length == 0)
-          res.status(404).json({});
+        if (groups.length == 0) {
+          console.log('No groups found for configId ' + configId);  
+          res.status(404).json([]);
+        }
         else {
           console.log('Number of groups fetched that belong to the configId ' + configId + ' = ' + groups.length);
           res.status(200).json(groups);

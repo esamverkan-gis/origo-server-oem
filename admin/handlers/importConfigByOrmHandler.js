@@ -12,9 +12,13 @@ var importConfigByOrm = function(req, res) {
   if (req.files) {
     //TODO: SANITYCHECK
     let file1 = req.files.file1;
-    req.body = JSON.parse(file1.data.toString());
-    console.log(req.body);
-    importJsonData(req, res);
+    try {
+      req.body = JSON.parse(file1.data);
+      importJsonData(req, res);
+    } catch ( err) {
+      console.log(err);
+    }
+    // console.log(req.body);
   } else {
     importJsonData(req, res);
   }
