@@ -105,7 +105,7 @@ module.exports = function(options) {
 
       var Config = db.define("config", {
         name: String,
-        projection_code: String,
+        // projection_code: String,
         projection_extent: String,
         extent: String,
         center: String,

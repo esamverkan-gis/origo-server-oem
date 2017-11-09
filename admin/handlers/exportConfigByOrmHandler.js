@@ -44,7 +44,7 @@ var exportConfigByOrm = function(req, res) {
       }
       configId = config.id;
       index.configName = config.name;
-      index.projectionCode = config.projection_code;
+      // index.projectionCode = config.projection_code;
       index.projectionExtent = config.projection_extent.split(',').map(Number);
       index.extent = config.extent.split(',').map(Number);
       index.center = config.center.split(',').map(Number);
@@ -52,6 +52,7 @@ var exportConfigByOrm = function(req, res) {
       index.zoom = config.zoom;
       index.featureInfoOptions = config.featureinfo_options;
       config.getProj4Defs(function(err, proj4Defs) {
+        index.projectionCode = proj4Defs.code;
         index.proj4Defs = [{
           "code": proj4Defs.code,
           "alias": proj4Defs.alias,

@@ -138,7 +138,7 @@ function importJsonData(req, res) {
         if (configs.length == 0) {
           config = new Config({
             name: config_name,
-            projection_code: config_projection_code,
+            // projection_code: config_projection_code, // we rely only on proj4defs_id, no need to save the code in config table
             projection_extent: config_projection_extent,
             extent: config_extent,
             center: config_center,
@@ -147,7 +147,7 @@ function importJsonData(req, res) {
             featureinfo_options: config_featureinfo_options
           });
 
-          Proj4Defs.find({ code: config.projection_code }, function(err, proj4Defs) {
+          Proj4Defs.find({ code: config_projection_code }, function(err, proj4Defs) {
             if (err) reject(err);
             //OBS! it seems like a bug and is strange but when a value is set on an object it will be saved to db automatically even though we have set 'autoSave = false' in the settings! 
             config.setProj4Defs(proj4Defs[0], function(err) {
