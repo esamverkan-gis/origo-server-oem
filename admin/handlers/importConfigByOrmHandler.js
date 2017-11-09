@@ -8,18 +8,23 @@ var fs = require('fs');
 var createStyleObject = require('./createStyleObject');
 
 var importConfigByOrm = function(req, res) {
-  console.log(req.files);
+  console.log(req.body);
+  console.log("Req.files:" + req.files);
   if (req.files) {
+    console.log("Importerar från req.files");
     //TODO: SANITYCHECK
     let file1 = req.files.file1;
-    try {
-      req.body = JSON.parse(file1.data);
-      importJsonData(req, res);
-    } catch ( err) {
-      console.log(err);
+    if(file1.data){
+      try {
+        req.body = JSON.parse(file1.data);
+        importJsonData(req, res);
+      } catch ( err) {
+        console.log(err);
+      }
     }
-    // console.log(req.body);
-  } else {
+  } 
+  else{
+    console.log("Importerar från POST-Body");
     importJsonData(req, res);
   }
 };
@@ -46,7 +51,7 @@ function importJsonData(req, res) {
   var sources = index.source;
 
   var config_name = index.configName;
-  console.log(index);
+
   if (!config_name) {
     var date = new Date();
     var config_name = date.toUTCString();

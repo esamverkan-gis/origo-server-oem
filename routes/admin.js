@@ -69,6 +69,9 @@ adminRouter.get('/exportConfig/:configId', exportConfigByOrmHandler);
 //********************************************************************importConfig********************************************************************************
 // read the index.json from body, form the corresponding objects and save them in the database
 var importConfigByOrmHandler = require('../admin/handlers/importConfigByOrmHandler');
+adminRouter.options('/importConfig',function (req, res, next) {
+    res.sendStatus(200);
+});
 adminRouter.post('/importConfig', importConfigByOrmHandler);
 
 // *************************************************************************getCapabilities*************************************************************************
