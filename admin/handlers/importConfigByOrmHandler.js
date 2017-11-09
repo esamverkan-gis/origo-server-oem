@@ -383,7 +383,7 @@ function importJsonData(req, res) {
     return saveAllControls();
   }).then(function() {
     console.log('done!');
-    res.status(200).send('done!');
+    res.status(200).send({});
   }).catch(function(error) {
     console.log(error);
     res.status(500).json(error.message);
