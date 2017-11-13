@@ -164,7 +164,9 @@ var exportConfigByOrm = function(req, res) {
       console.log('done!');
       res.setHeader('Content-disposition', 'attachment; filename=index.json');
       res.setHeader('Content-type', 'application/json');  
-      res.status(200).json(index);
+      // res.status(200).json(index);
+      res.status(200).send(JSON.stringify(index, undefined, 4));
+      // res.status(200).send(prettifyJson(JSON.stringify(index)));
     }).catch(function(error) {
       console.log(error);
       res.status(500).json(error.message);
@@ -172,4 +174,14 @@ var exportConfigByOrm = function(req, res) {
   });
 }
 
+function prettifyJson(jsonStr) {
+  try {
+    let obj = JSON.parse(jsonStr);	
+    return JSON.stringify(obj, undefined, 4);
+  }
+  catch(err) {
+    console.log("Could not prettify JSON, not valid JSON.");
+    return jsonStr;
+  }
+}
 module.exports = exportConfigByOrm;

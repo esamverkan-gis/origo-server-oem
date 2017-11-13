@@ -38,7 +38,7 @@ configRouter.route('/')
     else if (_.isEmpty(req.query))
       req.models.Config.find(function (err, configs) {
         if (!configs || configs.length == 0)
-          res.sendStatus(404);
+          res.status(404).json([]);
         else {
           console.log('Number of all configs fetched : ' + configs.length);
           res.status(200).json(configs);
