@@ -4,6 +4,9 @@ var express = require('express');
 var domainRouter = express.Router();
 var orm = require('orm');
 var _ = require('lodash');
+var helperFunctions = require('./handlers/serverHelperFunctions');
+var xmlParser = require('xml2js').parseString;
+var jsonRefiner = require('./handlers/jsonRefiner');
 
 // req.models is a reference to models that ar defined in models.js and used as a middleware in admin.js
 
@@ -314,5 +317,40 @@ domainRouter.route('/removeConfigGraph/:configId')
       });
     });
   });
+
+// ', '?url=' + source.url + '&layer=' + layer.name);
+domainRouter.route('/fetchAttributeFromServer')
+  .all(function (req, res, next) {
+    // runs for all HTTP verbs first
+    // think of it as route specific middleware!
+    next();
+  })
+  .options(function (req, res, next) {
+    res.sendStatus(200);
+  })
+  .get(function (req, res, next) {
+
+    var url = req.query.url;
+    var layerName = req.query.layerName;
+
+    var describeFeatureTypeUrl = helperFunctions.fixUrlforDescribeFeaturType(url, layerName);
+    // console.log(describeFeatureTypeUrl);
+    helperFunctions.fetchData(describeFeatureTypeUrl)
+      .then(function (response) {
+        xmlParser(response, function (err, jsonAttribute) {
+          var attributes = jsonRefiner.Attribute(jsonAttribute);
+          // console.log(attributes);
+          res.setHeader('Content-type', 'application/json');
+          res.status(200).json(attributes);
+        });
+      })
+      .catch(function (err) {
+        console.log(err);
+        res.setHeader('Content-type', 'application/json');
+        res.status(500).json([]);
+      });
+  });
+
+
 
 module.exports = domainRouter;

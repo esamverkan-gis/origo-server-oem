@@ -36,7 +36,7 @@ module.exports = function(req, response) {
 
         if (layer.queryable) { // here we should ckeck if layer is queryable, if it is then we can use describeFeatureType service to get its attributes
         // if (false) {
-          var describeFeatureTypeUrl = helperFunctions.fixUrlforDescribeFeaturType(url, layer);
+          var describeFeatureTypeUrl = helperFunctions.fixUrlforDescribeFeaturType(url, layer.name);
           // console.log(describeFeatureTypeUrl);
           return helperFunctions.fetchData(describeFeatureTypeUrl);
         } else {

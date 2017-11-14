@@ -105,15 +105,15 @@ var fixUrlforGetCapabilities = function(url) {
   return fixedUrl;
 }
 
-var fixUrlforDescribeFeaturType = function(url, layer) {
+var fixUrlforDescribeFeaturType = function(url, layerName) {
   var urlString = url;
   var fixedUrl = '';
   if (urlString.endsWith('?')) {
-    fixedUrl = urlString + 'request=DescribeFeatureType&typename=' + layer.name;
+    fixedUrl = urlString + 'request=DescribeFeatureType&typename=' + layerName;
   } else if (urlString.includes('?')) {
-    fixedUrl = urlString + '&request=DescribeFeatureType&typename=' + layer.name;
+    fixedUrl = urlString + '&request=DescribeFeatureType&typename=' + layerName;
   } else {
-    fixedUrl = urlString + '?request=DescribeFeatureType&typename=' + layer.name;
+    fixedUrl = urlString + '?request=DescribeFeatureType&typename=' + layerName;
   }
   if (fixedUrl.includes('geoserver/wms')) {
     fixedUrl = fixedUrl.replace('geoserver/wms', 'geoserver/wfs');

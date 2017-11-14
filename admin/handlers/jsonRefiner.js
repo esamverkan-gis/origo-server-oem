@@ -26,7 +26,7 @@ function setTrueOrFalse(value) {
   else return true;
 }
 
-var counter = 1;
+// var counter = 1;
 var Attribute = function(geoServerAttribute) {
 
   var path = 'xsd:schema.xsd:complexType[0].xsd:complexContent[0].xsd:extension[0].xsd:sequence[0].xsd:element';
