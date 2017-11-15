@@ -262,7 +262,6 @@ domainRouter.route('/removeConfigGraph/:configId')
   .all(function (req, res, next) {
     // runs for all HTTP verbs first
     // think of it as route specific middleware!
-    console.log('domain delete working!')
     next();
   })
   .options(function (req, res, next) {
@@ -286,12 +285,12 @@ domainRouter.route('/removeConfigGraph/:configId')
 
     req.models.Group.find({ config_id: configId }).remove(function (err) {
       if (err) console.log('error removing groups for config id: ' + configId);
-      // else console.log('groups removed for config id : ' + configId);
+      else console.log('Groups removed for config id : ' + configId);
     });
 
     req.models.Control.find({ config_id: configId }).remove(function (err) {
       if (err) console.log('error removing sources for config id : ' + configId);
-      // else console.log('sources removed for config id : ' + configId);
+      else console.log('Controls removed for config id : ' + configId);
     });
 
     req.models.Layer.find({ config_id: configId }).each(function (layer) {
