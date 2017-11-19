@@ -19,6 +19,8 @@ controlRouter.route('/')
   .get(function (req, res, next) {
     var controlName = req.query.name;
     var searchStr = req.query.search;
+    var configId = req.query.configId;
+
     // OBS! name=someName takes precedence over search, if name query exists search will have no effect
     if (controlName)
       req.models.Control.find({ name: controlName }, function (err, controls) {
@@ -35,6 +37,18 @@ controlRouter.route('/')
         else
           res.status(200).json(controls);
       });
+    // funktion för att hämta alla kontroller som har en viss konfig
+    else if (configId)
+      req.models.Control.find({ config_id: configId }, function (err, controls) {
+        if (controls.length == 0) {
+          console.log('No controls found for configId ' + configId);
+          res.status(404).json([]);
+        }
+        else {
+          console.log('Number of controls fetched that belong to the configId ' + configId + ' = ' + controls.length);
+          res.status(200).json(controls);
+        }
+      });
     else if (_.isEmpty(req.query))
       req.models.Control.find(function (err, controls) {
         if (!controls || controls.length == 0)
@@ -47,7 +61,7 @@ controlRouter.route('/')
     else
       res.sendStatus(400);
   })
-  .post(function (req, res) { 
+  .post(function (req, res) {
     const newControl = req.body;
     req.models.Control.create(newControl, function (err, control) {
       if (err) {
