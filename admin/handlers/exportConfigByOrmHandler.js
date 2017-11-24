@@ -145,7 +145,6 @@ var exportConfigByOrm = function(req, res) {
               index.layers.push(layerJsonObj);
               resolve();
             });
-
           }));
         }
         Promise.all(layersPromises).then(function() {

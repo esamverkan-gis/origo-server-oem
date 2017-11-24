@@ -111,9 +111,9 @@ controlRouter.route('/:id')
   })
   .delete(function (req, res, next) {
     req.models.Control.get(req.params.id, function (err, control) {
-      if (!control) res.sendStatus(404);
+      if (!control) res.status(404).json({});
       else control.remove(function (err) {
-        if (err) res.sendStatus(500);
+        if (err) res.status(500);
         else res.status(200).json({});
       });
     });
