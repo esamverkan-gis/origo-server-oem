@@ -25,6 +25,7 @@ module.exports = {
     'absolutePathStorage': 'C:/origoMapState'
   }, 
   adminDataBase: {
-  	'relativePath' : 'C:/Users/imta/Sundsvall/OrigoDataBase/OrigoDataBase.db'
+    // Will be used in the file OrigoServer/admin/models.js to point to the database, but the strange is that it starts from root of OrigoServer
+  	'relativePath' : './../OrigoDataBase/OrigoDataBase.db'
   }
 }
