@@ -4,7 +4,7 @@
 
 var orm = require('orm');
 
-var exportConfigByOrm = function(req, res) {
+var exportConfigByOrm = function (req, res) {
 
   var Group = req.models.Group;
   var Layer = req.models.Layer;
@@ -30,9 +30,9 @@ var exportConfigByOrm = function(req, res) {
   index.styles = {};
   var stylesMap = new Map();
 
-  var configPromise = new Promise(function(resolve, reject) {
+  var configPromise = new Promise(function (resolve, reject) {
     // Config.find({ name: configName }, function(err, rows) {
-    Config.find({ id: configId }, function(err, rows) {
+    Config.find({ id: configId }, function (err, rows) {
       if (rows.length == 0) {
         res.end('No config for this name was found.');
         return;
@@ -51,7 +51,7 @@ var exportConfigByOrm = function(req, res) {
       index.resolutions = config.resolutions.split(',').map(Number);
       index.zoom = config.zoom;
       index.featureInfoOptions = config.featureinfo_options;
-      config.getProj4Defs(function(err, proj4Defs) {
+      config.getProj4Defs(function (err, proj4Defs) {
         index.projectionCode = proj4Defs.code;
         index.proj4Defs = [{
           "code": proj4Defs.code,
@@ -63,12 +63,12 @@ var exportConfigByOrm = function(req, res) {
     });
   });
 
-  configPromise.then(function() {
+  configPromise.then(function () {
     // it is also possible to use config.getControls() method if we say Control.hasOne('config', Config, {reverse: 'control'}).
-    let controlsPromise = new Promise(function(resolve, reject) {
-      Control.find({ config_id: configId }, function(err, controls) {
+    let controlsPromise = new Promise(function (resolve, reject) {
+      Control.find({ config_id: configId }, function (err, controls) {
 
-        console.log('Number of controls : ' + controls.length);
+        if (controls) console.log('Number of controls : ' + controls.length);
         for (let control of controls) {
           index.controls.push(control.createJsonObject());
         }
@@ -76,19 +76,19 @@ var exportConfigByOrm = function(req, res) {
       });
     });
 
-    let layersPromise = new Promise(function(resolve, reject) {
-      Layer.find({ config_id: configId }, function(err, layers) {
+    let layersPromise = new Promise(function (resolve, reject) {
+      Layer.find({ config_id: configId }, function (err, layers) {
 
-        console.log('Number of layers   : ' + layers.length);
+        if (layers) console.log('Number of layers   : ' + layers.length);
         var layersPromises = [];
         for (let layer of layers) {
-          layersPromises.push(new Promise(function(resolve, reject) {
+          layersPromises.push(new Promise(function (resolve, reject) {
 
             let layerJsonObj = layer.createJsonObject();
-
-            let groupsPromise = function() {
-              return new Promise(function(resolve, reject) {
-                layer.getGroup(function(err, group) {
+            let groupsPromise = function () {
+              return new Promise(function (resolve, reject) {
+                layer.getGroup(function (err, group) {
+                  if (!group) reject(new Error('layer "' + layer.name + '" has no group.'));
                   layerJsonObj.group = group.name;
                   groupsMap.set(group.name, group.createJsonObject());
                   // index.groups.push(group.createJsonObject());
@@ -97,9 +97,10 @@ var exportConfigByOrm = function(req, res) {
               });
             }
 
-            let sourcePromise = function() {
-              return new Promise(function(resolve, reject) {
-                layer.getSource(function(err, source) {
+            let sourcePromise = function () {
+              return new Promise(function (resolve, reject) {
+                layer.getSource(function (err, source) {
+                  if (!source) reject(new Error('layer "' + layer.name + '" has no source.'));
                   layerJsonObj.source = source.name;
                   index.source[source.name] = source.createJsonObject();
                   sourcesMap.set(source.name, source.createJsonObject());
@@ -108,9 +109,10 @@ var exportConfigByOrm = function(req, res) {
               });
             }
 
-            let stylePromise = function() {
-              return new Promise(function(resolve, reject) {
-                layer.getStyle(function(err, style) {
+            let stylePromise = function () {
+              return new Promise(function (resolve, reject) {
+                layer.getStyle(function (err, style) {
+                  if (!style) reject(new Error('layer "' + layer.name + '" has no style.'));
                   layerJsonObj.style = style.name;
                   let arr = [];
                   arr[0] = [];
@@ -122,9 +124,9 @@ var exportConfigByOrm = function(req, res) {
               });
             }
 
-            let attributePromise = function() {
-              return new Promise(function(resolve, reject) {
-                Attribute.find({ layer_id: layer.id }, function(err, attributes) {
+            let attributePromise = function () {
+              return new Promise(function (resolve, reject) {
+                Attribute.find({ layer_id: layer.id }, function (err, attributes) {
                   if (attributes.length > 0) {
                     layerJsonObj.attributes = [];
                     for (let attribute of attributes) {
@@ -141,44 +143,53 @@ var exportConfigByOrm = function(req, res) {
               });
             }
 
-            Promise.all([groupsPromise(), sourcePromise(), stylePromise(), attributePromise()]).then(function() {
-              index.layers.push(layerJsonObj);
-              resolve();
-            });
+            Promise.all([groupsPromise(), sourcePromise(), stylePromise(), attributePromise()])
+              .then(function () {
+                index.layers.push(layerJsonObj);
+                resolve();
+              })
+              .catch(function (err) {
+                // console.log(err);
+                reject(err);
+              });
           }));
         }
-        Promise.all(layersPromises).then(function() {
+        Promise.all(layersPromises).then(function () {
           for (let group of groupsMap.values()) {
             index.groups.push(group);
           }
           resolve();
+        }).catch(function (err) {
+          // console.log(err);
+          reject(err);
         });
       });
     });
 
-    Promise.all([controlsPromise, layersPromise]).then(function() {
+    Promise.all([controlsPromise, layersPromise]).then(function () {
       console.log('Number of groups   : ' + groupsMap.size);
       console.log('Number of sources  : ' + sourcesMap.size);
       console.log('Number of styles   : ' + stylesMap.size);
       console.log('done!');
       res.setHeader('Content-disposition', 'attachment; filename=index.json');
-      res.setHeader('Content-type', 'application/json');  
+      res.setHeader('Content-type', 'application/json');
       // res.status(200).json(index);
       res.status(200).send(JSON.stringify(index, undefined, 4));
       // res.status(200).send(prettifyJson(JSON.stringify(index)));
-    }).catch(function(error) {
+    }).catch(function (error) {
       console.log(error);
-      res.status(500).json(error.message);
+      // if we do not send status 200, it won't be downloaded and a backup.json file will be downloaded in the OrigoAdmin
+      res.status(200).json(error.message);
     });
   });
 }
 
-function prettifyJson(jsonStr) {
+function prettifyJson (jsonStr) {
   try {
-    let obj = JSON.parse(jsonStr);	
+    let obj = JSON.parse(jsonStr);
     return JSON.stringify(obj, undefined, 4);
   }
-  catch(err) {
+  catch (err) {
     console.log("Could not prettify JSON, not valid JSON.");
     return jsonStr;
   }
