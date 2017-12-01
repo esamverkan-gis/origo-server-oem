@@ -68,7 +68,15 @@ var exportConfigByOrm = function (req, res) {
     let controlsPromise = new Promise(function (resolve, reject) {
       Control.find({ config_id: configId }, function (err, controls) {
 
-        if (controls) console.log('Number of controls : ' + controls.length);
+        if (controls) {
+          console.log('Number of controls : ' + controls.length);
+          // there is bug in Origo that need to have "mapmenu" before "legend" in the list of controls! because of that we need to sort it so that mapmeu comes first.
+          controls.sort(function (a, b) {
+            if (a.name < b.name) return 1;
+            if (a.name > b.name) return -1;
+            return 0;
+          });
+        }
         for (let control of controls) {
           index.controls.push(control.createJsonObject());
         }
