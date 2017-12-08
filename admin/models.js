@@ -165,13 +165,18 @@ module.exports = function(options) {
             let obj = {};
             let styleType = this.style_type;
             if (styleType == 'stroke') {
+              obj.stroke = {};
+              obj.fill = {};
               obj.stroke.color = this.stroke_color;
               obj.fill.color = this.fill_color;
             }
             if (styleType == 'circle') {
+              obj.circle = {};
               obj.circle.radius = this.radius;
+              obj.circle.stroke = {};
               obj.circle.stroke.color = this.stroke_color;
               obj.circle.stroke.width = this.width;
+              obj.circle.fill = {};
               obj.circle.fill.color = this.fill_color;
             }
             if (styleType == 'icon') {

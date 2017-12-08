@@ -14,16 +14,16 @@ var importConfigByOrm = function(req, res) {
     console.log("Importerar från req.files");
     //TODO: SANITYCHECK
     let file1 = req.files.file1;
-    if(file1.data){
+    if(file1.data) {
       try {
         req.body = JSON.parse(file1.data);
         importJsonData(req, res);
-      } catch ( err) {
+      } catch (err) {
         console.log(err);
       }
     }
   } 
-  else{
+  else {
     console.log("Importerar från POST-Body");
     importJsonData(req, res);
   }
@@ -137,7 +137,8 @@ function importJsonData(req, res) {
         // if a config with this name already exists in the database it returns otherwise we create and save a new config. 
         if (configs.length > 0) {
           console.log('configuration with this name already exists in database.');
-          res.end('configuration with this name already exists in database.');
+          // res.end('configuration with this name already exists in database.');
+          reject(new Error('configuration with this name already exists in database.'));
           return;
         }
         if (configs.length == 0) {
@@ -386,7 +387,8 @@ function importJsonData(req, res) {
     res.status(200).send({});
   }).catch(function(error) {
     console.log(error);
-    res.status(500).json(error.message);
+    // exceptionMessage is used in order to signal adminapi that there is an error, see method of basePostFormAsMultiData in adminapi.
+    res.status(400).json({exceptionMessage: error.message});
     // catch(console.log.bind(console)); // <-- this is badass
   });
 }
