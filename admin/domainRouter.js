@@ -117,36 +117,6 @@ domainRouter.route('/fetchLayersAndGroups/:configId')
     });
   });
 
-domainRouter.route('/test/:configId')
-  .all(function (req, res, next) {
-    // runs for all HTTP verbs first
-    // think of it as route specific middleware!
-    next();
-  })
-  .options(function (req, res, next) {
-    res.sendStatus(200);
-  })
-  .get(function (req, res, next) {
-    console.log('test working!');
-    var configId = req.params["configId"];
-
-    req.models.Layer.find({ config_id: configId }, function (err, layers) {
-
-      var layer = layers[0];
-
-      var promise = new Promise(function (resolve, reject) {
-        layer.getGroup(function (err, group) {
-          resolve();
-        })
-      });
-
-      promise.then(function () {
-        res.send(layer);
-      });
-    });
-
-  });
-
 // this method fetches all groups for a config that has at least one layer.
 // empty groups will not be returned 
 domainRouter.route('/fetchConfigNotEmptyGroups/:configId')
@@ -319,6 +289,7 @@ domainRouter.route('/removeConfigGraph/:configId')
 
 // ', '?url=' + source.url + '&layer=' + layer.name);
 domainRouter.route('/fetchAttributeFromServer')
+
   .all(function (req, res, next) {
     // runs for all HTTP verbs first
     // think of it as route specific middleware!
@@ -351,5 +322,85 @@ domainRouter.route('/fetchAttributeFromServer')
   });
 
 
+domainRouter.route('/fetchConfigStyles/:configId')
+  .all(function (req, res, next) {
+    // runs for all HTTP verbs first
+    // think of it as route specific middleware!
+    next();
+  })
+  .options(function (req, res, next) {
+    res.sendStatus(200);
+  })
+  .get(function (req, res, next) {
+
+    var Layer = req.models.Layer;
+    var Config = req.models.Config;
+    var Style = req.models.Style;
+    var configId = req.params["configId"];
+    var styles = [];
+
+    var configPromise = new Promise(function (resolve, reject) {
+      Config.find({ id: configId }, function (err, rows) {
+        if (rows.length == 0) {
+          res.end('No config for this id was found.');
+          return;
+        } else {
+          var config = rows[0];
+        }
+        resolve();
+      });
+    });
+
+    configPromise.then(function () {
+
+      let layersPromise = new Promise(function (resolve, reject) {
+        Layer.find({ config_id: configId }, function (err, layers) {
+          var layersPromises = [];
+          for (let layer of layers) {
+            layersPromises.push(new Promise(function (resolve, reject) {
+              let obj = {};
+              let stylePromise = function () {
+                return new Promise(function (resolve, reject) {
+                  layer.getStyle(function (err, style) {
+                    // if (!style) reject(new Error('layer "' + layer.name + '" has no style.'));
+                    if (style) {
+                      obj.name = style.name;
+                      obj.id = style.id;
+                    }
+                    resolve();
+                  });
+                });
+              }
+              stylePromise()
+                .then(function () {
+                  styles.push(obj);
+                  resolve();
+                })
+                .catch(function (err) {
+                  reject(err);
+                });
+            }));
+          }
+          Promise.all(layersPromises).then(function () {
+            resolve();
+          }).catch(function (err) {
+            reject(err);
+          });
+        });
+      });
+
+      layersPromise.then(function () {
+        console.log('done!');
+        res.setHeader('Content-disposition', 'attachment; filename=index.json');
+        res.setHeader('Content-type', 'application/json');
+        res.status(200).json(styles);
+      }).catch(function (error) {
+        console.log(error);
+        // if we do not send status 200, it won't be downloaded and a backup.json file will be downloaded in the OrigoAdmin
+        res.status(200).json(error.message);
+      });
+    });
+  });
 
 module.exports = domainRouter;
+

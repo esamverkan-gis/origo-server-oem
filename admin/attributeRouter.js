@@ -23,7 +23,7 @@ attributeRouter.route('/')
       req.models.Attribute.find({ layer_id: layerId }, function(err, attributes) {
         console.log('Number of attributes fetched that belong to the layerId ' + layerId + ' = ' + attributes.length);
         if (attributes.length == 0)
-          res.status(404).json([]);
+          res.status(200).json([]);
         else
           res.status(200).json(attributes);
       });

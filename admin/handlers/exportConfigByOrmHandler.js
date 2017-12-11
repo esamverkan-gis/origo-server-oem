@@ -163,9 +163,31 @@ var exportConfigByOrm = function (req, res) {
           }));
         }
         Promise.all(layersPromises).then(function () {
+          // with two iterations we ensure that all groups with parent will come after their parent group.
+          var groups1 = [];
+          var groups2 = [];
           for (let group of groupsMap.values()) {
-            index.groups.push(group);
+            if (!group.parent)
+              groups1.push(group);
+            else
+              groups2.push(group);
           }
+          // recursive function to make sure that all subgroups are coming after their parent too.
+          function swap () {
+            for (var i = 0; i < groups2.length; i++) {
+              let first = groups2[i];
+              let rest = groups2.slice(i);
+              let parentIndex = rest.findIndex(e => first.parent === e.name);
+              if (parentIndex > 0) {
+                groups2[i] = groups2[parentIndex + i];
+                groups2[parentIndex + i] = first;
+                swap();
+              }
+            }
+          }
+          swap();
+          let groups = [...groups1, ...groups2];
+          index.groups = groups;
           resolve();
         }).catch(function (err) {
           // console.log(err);
