@@ -287,6 +287,46 @@ domainRouter.route('/removeConfigGraph/:configId')
     });
   });
 
+domainRouter.route('/removeLayerGraph/:layerId')
+  .all(function (req, res, next) {
+    // runs for all HTTP verbs first
+    // think of it as route specific middleware!
+    next();
+  })
+  .options(function (req, res, next) {
+    res.sendStatus(200);
+  })
+  .delete(function (req, res, next) {
+    const layerId = req.params.layerId;
+    req.models.Layer.get(layerId, function (err, layer) {
+      if (err) res.sendStatus(500);      
+      if (!layer) res.sendStatus(404);      
+      layer.getStyle(function (err, style) {
+        if (err)
+          console.log('error getting style for layer id = ' + layer.id);
+        if (style)
+          style.remove(function (err) {
+            if (err) console.log('error removing style id : ' + style.id);
+            else console.log('style removed, id : ' + style.id);
+          });
+      });
+      req.models.Attribute.find({ layer_id: layer.id }).remove(function (err) {
+        if (err) console.log('error removing attributes for layer id : ' + layer.id);
+        else console.log('attributes removed for layer id : ' + layer.id);
+      });
+      layer.remove(function (err) {
+        if (err) {
+          console.log('error removing layer id : ' + layer.id);
+          res.sendStatus(500);
+        }
+        else {
+          console.log('layer removed, id : ' + layer.id);
+          res.status(200).json({});          
+        }
+      });
+    })
+  });
+
 // ', '?url=' + source.url + '&layer=' + layer.name);
 domainRouter.route('/fetchAttributeFromServer')
 
