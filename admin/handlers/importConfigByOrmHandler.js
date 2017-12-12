@@ -136,12 +136,13 @@ function importJsonData(req, res) {
       Config.find({ name: config_name }, function(err, configs) {
         // if a config with this name already exists in the database it returns otherwise we create and save a new config. 
         if (configs.length > 0) {
-          console.log('configuration with this name already exists in database.');
-          // res.end('configuration with this name already exists in database.');
-          reject(new Error('configuration with this name already exists in database.'));
-          return;
+          // console.log('configuration with this name already exists in database.');
+          //reject(new Error('configuration with this name already exists in database.'));
+          // return;
+          var date = new Date();
+          config_name = config_name + '-copy-' + date.getTime();
         }
-        if (configs.length == 0) {
+        //if (configs.length == 0) {
           config = new Config({
             name: config_name,
             // projection_code: config_projection_code, // we rely only on proj4defs_id, no need to save the code in config table
@@ -164,7 +165,7 @@ function importJsonData(req, res) {
               resolve();
             });
           });
-        }
+        //}
       });
     });
   };
