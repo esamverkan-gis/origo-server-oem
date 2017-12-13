@@ -137,7 +137,7 @@ function importJsonData (req, res) {
       // Config.find({ name: config_name }, function(err, configs) {
       Config.find({ name: orm.like(config_name + "%") }, function (err, configs) {
         // if a config with this name already exists in the database we create and save a new config with a new name.
-        // new name will be the name followed by -copy- and a counter number. 
+        // new name will be the name followed by -kopia- and a counter number. 
         if (configs.length > 0) {
           console.log('Number of configs that start with ' + config_name + ' : ' + configs.length);
           var names = [];
@@ -148,7 +148,7 @@ function importJsonData (req, res) {
             var counter = 0;
             do {
               counter++;
-              var newName = config_name + '-copy-' + counter;
+              var newName = config_name + '-kopia-' + counter;
             } while (names.includes(newName));
             config_name = newName;
           }
