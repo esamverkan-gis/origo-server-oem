@@ -7,14 +7,14 @@ var fs = require('fs');
 
 var createStyleObject = require('./createStyleObject');
 
-var importConfigByOrm = function(req, res) {
+var importConfigByOrm = function (req, res) {
   console.log(req.body);
   console.log("Req.files:" + req.files);
   if (req.files) {
     console.log("Importerar från req.files");
     //TODO: SANITYCHECK
     let file1 = req.files.file1;
-    if(file1.data) {
+    if (file1.data) {
       try {
         req.body = JSON.parse(file1.data);
         importJsonData(req, res);
@@ -22,14 +22,14 @@ var importConfigByOrm = function(req, res) {
         console.log(err);
       }
     }
-  } 
+  }
   else {
     console.log("Importerar från POST-Body");
     importJsonData(req, res);
   }
 };
 
-function importJsonData(req, res) {
+function importJsonData (req, res) {
   // return new Promise(function(resolve, reject) {
 
   var Group = req.models.Group;
@@ -88,9 +88,9 @@ function importJsonData(req, res) {
   // after that it connects to an existing database.
 
   // Problem: db object is not available !
-  let syncDatabase = function() {
-    return new Promise(function(resolve, reject) {
-      db.sync(function(err) {
+  let syncDatabase = function () {
+    return new Promise(function (resolve, reject) {
+      db.sync(function (err) {
         if (err) reject(err);
         else {
           console.log('syncing database');
@@ -105,11 +105,11 @@ function importJsonData(req, res) {
 
   // this promise will go through the array of proj4Defs in the index.json,
   // if there are more proj4Defs, add them to the table if they do not already exist.
-  let saveProj4defs = function() {
-    return new Promise(function(resolve, reject) {
+  let saveProj4defs = function () {
+    return new Promise(function (resolve, reject) {
       for (let config_proj4Def of config_proj4Defs) {
         // TODO: use Proj4Defs.exist() istead. 
-        Proj4Defs.find({ code: config_proj4Def.code }, function(err, proj4Defs) {
+        Proj4Defs.find({ code: config_proj4Def.code }, function (err, proj4Defs) {
           if (err) reject(err);
           // console.log('length: ' + proj4Defs.length);
           if (proj4Defs.length == 0) {
@@ -118,7 +118,7 @@ function importJsonData(req, res) {
               alias: config_proj4Def.alias,
               projection: config_proj4Def.projection
             });
-            Proj4Defs.create(proj4Def, function(err) {
+            Proj4Defs.create(proj4Def, function (err) {
               if (err) reject(err);
               else console.log('proj4defs saved');
             });
@@ -129,49 +129,60 @@ function importJsonData(req, res) {
     });
   };
 
-  let saveConfig = function() {
-    return new Promise(function(resolve, reject) {
+  let saveConfig = function () {
+    return new Promise(function (resolve, reject) {
       // saving the config using proj4defs from previous promise, is resolved, return config object
       // TODO: use Config.exist() instead
-      Config.find({ name: config_name }, function(err, configs) {
-        // if a config with this name already exists in the database it returns otherwise we create and save a new config. 
+      // Config.find({ name: config_name }, function(err, configs) {
+      // Config.find({ name: config_name }, function(err, configs) {
+      Config.find({ name: orm.like(config_name + "%") }, function (err, configs) {
+        // if a config with this name already exists in the database we create and save a new config with a new name.
+        // new name will be the name followed by -copy- and a counter number. 
         if (configs.length > 0) {
-          // console.log('configuration with this name already exists in database.');
-          //reject(new Error('configuration with this name already exists in database.'));
-          // return;
-          var date = new Date();
-          config_name = config_name + '-copy-' + date.getTime();
+          console.log('Number of configs that start with ' + config_name + ' : ' + configs.length);
+          var names = [];
+          configs.forEach(element => {
+            names.push(element.name);
+          });
+          if (names.includes(config_name)) {
+            var counter = 0;
+            do {
+              counter++;
+              var newName = config_name + '-copy-' + counter;
+            } while (names.includes(newName));
+            config_name = newName;
+          }
         }
         //if (configs.length == 0) {
-          config = new Config({
-            name: config_name,
-            // projection_code: config_projection_code, // we rely only on proj4defs_id, no need to save the code in config table
-            projection_extent: config_projection_extent,
-            extent: config_extent,
-            center: config_center,
-            zoom: config_zoom,
-            resolutions: config_resolutions,
-            featureinfo_options: config_featureinfo_options
-          });
+        config = new Config({
+          name: config_name,
+          // projection_code: config_projection_code, // we rely only on proj4defs_id, no need to save the code in config table
+          projection_extent: config_projection_extent,
+          extent: config_extent,
+          center: config_center,
+          zoom: config_zoom,
+          resolutions: config_resolutions,
+          featureinfo_options: config_featureinfo_options
+        });
 
-          Proj4Defs.find({ code: config_projection_code }, function(err, proj4Defs) {
+        Proj4Defs.find({ code: config_projection_code }, function (err, proj4Defs) {
+          if (err) reject(err);
+          //OBS! it seems like a bug and is strange but when a value is set on an object it will be saved to db automatically even though we have set 'autoSave = false' in the settings! 
+          config.setProj4Defs(proj4Defs[0], function (err) {
             if (err) reject(err);
-            //OBS! it seems like a bug and is strange but when a value is set on an object it will be saved to db automatically even though we have set 'autoSave = false' in the settings! 
-            config.setProj4Defs(proj4Defs[0], function(err) {
-              if (err) reject(err);
-              // Now from here a full config object is available
-              // res.end(JSON.stringify(layers));
-              console.log('config saved');
-              resolve();
-            });
+            // Now from here a full config object is available
+            // res.end(JSON.stringify(layers));
+            console.log('config saved');
+            resolve();
           });
+        });
         //}
       });
     });
   };
 
-  let saveAllGroups = function() {
-    return new Promise(function(resolve, reject) {
+  let saveAllGroups = function () {
+    return new Promise(function (resolve, reject) {
       // try saving all groups and if resolved return a Map with id, name of the groups
       var groupOrderNumber = 1;
       var data = [];
@@ -187,7 +198,7 @@ function importJsonData(req, res) {
           config_id: config.id
         });
       }
-      Group.create(data, function(err, results) {
+      Group.create(data, function (err, results) {
         if (err) {
           reject(err);
         } else {
@@ -201,14 +212,14 @@ function importJsonData(req, res) {
     });
   };
 
-  let saveAllSources = function() {
-    return new Promise(function(resolve, reject) {
+  let saveAllSources = function () {
+    return new Promise(function (resolve, reject) {
       // saving all source and if resolved return a Map with id, name of source
       // sorces are saved if they do not alrady exist and existence is checked based on their url and not name!
-      Source.find(function(err, sourcesFromDatabase) {
+      Source.find(function (err, sourcesFromDatabase) {
         var data = [];
         for (let sourceName of Object.keys(sources)) {
-          var sourceFromDatabase = sourcesFromDatabase.find(function(item) {
+          var sourceFromDatabase = sourcesFromDatabase.find(function (item) {
             return item.url == sources[sourceName].url;
           });
           if (sourceFromDatabase) {
@@ -223,7 +234,7 @@ function importJsonData(req, res) {
           }
         }
 
-        Source.create(data, function(err, results) {
+        Source.create(data, function (err, results) {
           if (err) {
             reject(err);
           } else {
@@ -239,15 +250,15 @@ function importJsonData(req, res) {
     });
   };
 
-  let saveAllStyles = function() {
-    return new Promise(function(resolve, reject) {
+  let saveAllStyles = function () {
+    return new Promise(function (resolve, reject) {
       // saving all styles and if resolved return a Map with id, name of source
       var data = [];
       for (let styleName of Object.keys(styles)) {
         var styleOptions = styles[styleName];
         data.push(createStyleObject(styleName, styleOptions));
       }
-      Style.create(data, function(err, results) {
+      Style.create(data, function (err, results) {
         if (err) {
           reject(err);
         } else {
@@ -261,8 +272,8 @@ function importJsonData(req, res) {
     });
   };
 
-  let saveAllLayers = function() {
-    return new Promise(function(resolve, reject) {
+  let saveAllLayers = function () {
+    return new Promise(function (resolve, reject) {
       // saving all layers using config and groups
       var layerOrderNumber = 1;
       var data = [];
@@ -302,7 +313,7 @@ function importJsonData(req, res) {
           style_id: style.id
         });
       }
-      Layer.create(data, function(err, results) {
+      Layer.create(data, function (err, results) {
         if (err) {
           reject(err);
         } else {
@@ -316,8 +327,8 @@ function importJsonData(req, res) {
     });
   };
 
-  let saveAllAttributes = function() {
-    return new Promise(function(resolve, reject) {
+  let saveAllAttributes = function () {
+    return new Promise(function (resolve, reject) {
       // saving all attributes using layer id
       var data = [];
       for (let layer of layers) {
@@ -334,7 +345,7 @@ function importJsonData(req, res) {
           });
         }
       }
-      Attribute.create(data, function(err, results) {
+      Attribute.create(data, function (err, results) {
         if (err) {
           reject(err);
         } else {
@@ -345,8 +356,8 @@ function importJsonData(req, res) {
     });
   };
 
-  let saveAllControls = function() {
-    return new Promise(function(resolve, reject) {
+  let saveAllControls = function () {
+    return new Promise(function (resolve, reject) {
       // saving all controls and if resolved return a Map with id, name of control
       var data = [];
       for (let control of controls) {
@@ -356,7 +367,7 @@ function importJsonData(req, res) {
           options: control.options
         });
       }
-      Control.create(data, function(err, results) {
+      Control.create(data, function (err, results) {
         if (err) {
           reject(err);
         } else {
@@ -367,29 +378,29 @@ function importJsonData(req, res) {
     });
   };
 
-  syncDatabase().then(function() {
+  syncDatabase().then(function () {
     return saveProj4defs();
-  }).then(function() {
+  }).then(function () {
     return saveConfig();
-  }).then(function() {
+  }).then(function () {
     return saveAllGroups();
-  }).then(function() {
+  }).then(function () {
     return saveAllSources();
-  }).then(function() {
+  }).then(function () {
     return saveAllStyles();
-  }).then(function() {
+  }).then(function () {
     return saveAllLayers();
-  }).then(function() {
+  }).then(function () {
     return saveAllAttributes();
-  }).then(function() {
+  }).then(function () {
     return saveAllControls();
-  }).then(function() {
+  }).then(function () {
     console.log('done!');
     res.status(200).send({});
-  }).catch(function(error) {
+  }).catch(function (error) {
     console.log(error);
     // exceptionMessage is used in order to signal adminapi that there is an error, see method of basePostFormAsMultiData in adminapi.
-    res.status(400).json({exceptionMessage: error.message});
+    res.status(400).json({ exceptionMessage: error.message });
     // catch(console.log.bind(console)); // <-- this is badass
   });
 }
