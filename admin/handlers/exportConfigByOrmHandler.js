@@ -198,7 +198,8 @@ var exportConfigByOrm = function (req, res) {
             tempGroups.push(group);
           }
           tempGroups.sort((a,b) => a.order_number - b.order_number);
-          index.groups = tempGroups;          
+
+          index.groups = tempGroups.map(g => delete g.order_number);          
           resolve();
         }).catch(function (err) {
           // console.log(err);
