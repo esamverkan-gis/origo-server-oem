@@ -275,9 +275,11 @@ function importJsonData (req, res) {
   let saveAllLayers = function () {
     return new Promise(function (resolve, reject) {
       // saving all layers using config and groups
-      var layerOrderNumber = 1;
+      // var layerOrderNumber = 1;
       var data = [];
-      for (let layer of layers) {
+      var currentgroup = "";
+      var groupCounter = 1;
+      for (let layer of layers) { // TODO: sort by group.name and then alphabeticaly layer.title
         let group = savedGroups.get(layer.group);
         if (!group) {
           console.log('layer ' + layer.name + ' has no group or group deos not exist in groups!');
@@ -296,7 +298,12 @@ function importJsonData (req, res) {
           reject(Error('layer ' + layer.name + ' has no style or style deos not exist in styles!'));
           return;
         }
-        layer.order_number = layerOrderNumber++;
+        if (group.name != currentgroup.name) {
+          groupCounter = 1;
+          currentgroup = group;
+        }
+        layer.order_number = groupCounter++;
+        //layer.order_number = layerOrderNumber++;
         data.push({
           name: layer.name,
           name_id: layer.id,

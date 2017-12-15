@@ -87,7 +87,10 @@ var exportConfigByOrm = function (req, res) {
     let layersPromise = new Promise(function (resolve, reject) {
       Layer.find({ config_id: configId }, function (err, layers) {
 
-        if (layers) console.log('Number of layers   : ' + layers.length);
+        if (layers)  {
+          console.log('Number of layers   : ' + layers.length);
+          layers.sort((a, b) => a.order_number - b.order_number);
+        }
         var layersPromises = [];
         for (let layer of layers) {
           layersPromises.push(new Promise(function (resolve, reject) {
@@ -99,7 +102,8 @@ var exportConfigByOrm = function (req, res) {
                   if (!group) reject(new Error('layer "' + layer.name + '" has no group.'));
                   layerJsonObj.group = group.name;
                   groupsMap.set(group.name, group.createJsonObject());
-                  // index.groups.push(group.createJsonObject());
+                  // we need to save the groups in a map to avoid saving the same group several times! if we push directly every layer will have a group!
+                  // index.groups.push(group.createJsonObject()); 
                   resolve();
                 });
               });
@@ -163,7 +167,7 @@ var exportConfigByOrm = function (req, res) {
           }));
         }
         Promise.all(layersPromises).then(function () {
-          // with two iterations we ensure that all groups with parent will come after their parent group.
+          /* // with two iterations we ensure that all groups with parent will come after their parent group.
           var groups1 = [];
           var groups2 = [];
           for (let group of groupsMap.values()) {
@@ -186,8 +190,15 @@ var exportConfigByOrm = function (req, res) {
             }
           }
           swap();
-          let groups = [...groups1, ...groups2];
-          index.groups = groups;
+          let groups = [...groups1, ...groups2]; 
+          index.groups = groups; */
+
+          let tempGroups = [];
+          for (let group of groupsMap.values()) {
+            tempGroups.push(group);
+          }
+          tempGroups.sort((a,b) => a.order_number - b.order_number);
+          index.groups = tempGroups;          
           resolve();
         }).catch(function (err) {
           // console.log(err);

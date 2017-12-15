@@ -26,6 +26,7 @@ module.exports = function(options) {
             obj.title = this.title;
             if (this.parent) obj.parent = this.parent;
             obj.expanded = this.expanded;
+            obj.order_number = this.order_number;
             return obj;
           },
           // this method finds a layer (just any layer) that belongs to this group, then returns its config_id.
