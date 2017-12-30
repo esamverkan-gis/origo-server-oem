@@ -186,28 +186,18 @@ function importJsonData (req, res) {
       // try saving all groups and if resolved return a Map with id, name of the groups
       var groupOrderNumber = 1;
       var data = [];
-
-      // WARNING: this functions handles both styles of groups structure, but the file being imported should not be mixed. 
-      let f = function (groups, parent) {
-        console.log(groups);
-        for (let group of groups) {
-          group.order_number = groupOrderNumber++;
-          data.push({
-            name: group.name,
-            title: group.title,
-            parent: parent || group.parent,
-            expanded: group.expanded,
-            order_number: group.order_number,
-            // this line was added later and is not part of the original db design
-            config_id: config.id
-          });
-          if (group.groups) {
-            f(group.groups, group.name);
-          }
-        }
-      };
-      f(groups);
-
+      for (let group of groups) {
+        group.order_number = groupOrderNumber++;
+        data.push({
+          name: group.name,
+          title: group.title,
+          parent: group.parent,
+          expanded: group.expanded,
+          order_number: group.order_number,
+          // this line was added later and is not part of the original db design
+          config_id: config.id
+        });
+      }
       Group.create(data, function (err, results) {
         if (err) {
           reject(err);

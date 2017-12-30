@@ -6,8 +6,6 @@ var orm = require('orm');
 
 var exportConfigByOrm = function (req, res) {
 
-  var exportStyle = 'origo';
-
   var Group = req.models.Group;
   var Layer = req.models.Layer;
   var Source = req.models.Source;
@@ -26,8 +24,7 @@ var exportConfigByOrm = function (req, res) {
   index.layers = [];
 
   index.groups = [];
-  // var groupsMap = new Map();
-  var groups = [];  
+  var groupsMap = new Map();
   index.source = {};
   var sourcesMap = new Map();
   index.styles = {};
@@ -87,89 +84,10 @@ var exportConfigByOrm = function (req, res) {
       });
     });
 
-    let groupsPromise = new Promise(function (resolve, reject) {
-      Group.find({ config_id: configId }, function (err, groupss) {
-
-        if (groupss) {
-          console.log('Number of groups : ' + groupss.length);
-         // TODO: sorting groups
-        }
-        for (let grp of groupss) {
-          groups.push(grp.createJsonObject());
-        }
-        if (exportStyle === 'decerno') {
-          /* // with two iterations we ensure that all groups with parent will come after their parent group.
-          var groups1 = [];
-          var groups2 = [];
-          for (let group of groupsMap.values()) {
-            if (!group.parent)
-              groups1.push(group);
-            else
-              groups2.push(group);
-          }
-          // recursive function to make sure that all subgroups are coming after their parent too.
-          function swap () {
-            for (var i = 0; i < groups2.length; i++) {
-              let first = groups2[i];
-              let rest = groups2.slice(i);
-              let parentIndex = rest.findIndex(e => first.parent === e.name);
-              if (parentIndex > 0) {
-                groups2[i] = groups2[parentIndex + i];
-                groups2[parentIndex + i] = first;
-                swap();
-              }
-            }
-          }
-          swap();
-          let groups = [...groups1, ...groups2]; 
-          index.groups = groups; */
-
-          groups.sort((a, b) => a.order_number - b.order_number);
-          index.groups = groups.map(g => delete g.order_number);
-          resolve();
-
-        } else if (exportStyle === 'origo') {
-          
-          console.log(groups);
-          let findParent = function (group, groups) {
-            let res = null;
-            let ll = groups.length;
-            for (let i = 0; i < ll; i++) {
-              let g = groups[i];
-              if (g.name === group.parent)
-                return g;
-              if (g.groups) {
-                res = findParent(group, g.groups);
-                if (res) {
-                  return res;
-                }
-              }
-            }
-          }
-          let l = groups.length;
-          for (let i = 0; i < l; i++) {
-            let group = groups.shift();
-            if (group.parent) {
-              let parent = findParent(group, groups);
-              if (!parent.groups) parent.groups = [];
-              parent.groups.push(group);
-              delete group.order_number;
-              delete group.parent;
-            } else {
-              groups.push(group);
-              delete group.order_number;
-            }
-          }
-        }
-        index.groups = groups;
-        resolve();
-      });
-    });
-
     let layersPromise = new Promise(function (resolve, reject) {
       Layer.find({ config_id: configId }, function (err, layers) {
 
-        if (layers) {
+        if (layers)  {
           console.log('Number of layers   : ' + layers.length);
           layers.sort((a, b) => a.order_number - b.order_number);
         }
@@ -178,12 +96,12 @@ var exportConfigByOrm = function (req, res) {
           layersPromises.push(new Promise(function (resolve, reject) {
 
             let layerJsonObj = layer.createJsonObject();
-            let groupPromise = function () {
+            let groupsPromise = function () {
               return new Promise(function (resolve, reject) {
                 layer.getGroup(function (err, group) {
                   if (!group) reject(new Error('layer "' + layer.name + '" has no group.'));
                   layerJsonObj.group = group.name;
-                  // groupsMap.set(group.name, group.createJsonObject());
+                  groupsMap.set(group.name, group.createJsonObject());
                   // we need to save the groups in a map to avoid saving the same group several times! if we push directly every layer will have a group!
                   // index.groups.push(group.createJsonObject()); 
                   resolve();
@@ -237,7 +155,7 @@ var exportConfigByOrm = function (req, res) {
               });
             }
 
-            Promise.all([groupPromise(), sourcePromise(), stylePromise(), attributePromise()])
+            Promise.all([groupsPromise(), sourcePromise(), stylePromise(), attributePromise()])
               .then(function () {
                 index.layers.push(layerJsonObj);
                 resolve();
@@ -249,6 +167,39 @@ var exportConfigByOrm = function (req, res) {
           }));
         }
         Promise.all(layersPromises).then(function () {
+          /* // with two iterations we ensure that all groups with parent will come after their parent group.
+          var groups1 = [];
+          var groups2 = [];
+          for (let group of groupsMap.values()) {
+            if (!group.parent)
+              groups1.push(group);
+            else
+              groups2.push(group);
+          }
+          // recursive function to make sure that all subgroups are coming after their parent too.
+          function swap () {
+            for (var i = 0; i < groups2.length; i++) {
+              let first = groups2[i];
+              let rest = groups2.slice(i);
+              let parentIndex = rest.findIndex(e => first.parent === e.name);
+              if (parentIndex > 0) {
+                groups2[i] = groups2[parentIndex + i];
+                groups2[parentIndex + i] = first;
+                swap();
+              }
+            }
+          }
+          swap();
+          let groups = [...groups1, ...groups2]; 
+          index.groups = groups; */
+
+          let tempGroups = [];
+          for (let group of groupsMap.values()) {
+            tempGroups.push(group);
+          }
+          tempGroups.sort((a,b) => a.order_number - b.order_number);
+
+          index.groups = tempGroups.map(g => delete g.order_number);          
           resolve();
         }).catch(function (err) {
           // console.log(err);
@@ -257,8 +208,8 @@ var exportConfigByOrm = function (req, res) {
       });
     });
 
-    Promise.all([controlsPromise, layersPromise, groupsPromise]).then(function () {
-      console.log('Number of groups   : ' + groups.length);
+    Promise.all([controlsPromise, layersPromise]).then(function () {
+      console.log('Number of groups   : ' + groupsMap.size);
       console.log('Number of sources  : ' + sourcesMap.size);
       console.log('Number of styles   : ' + stylesMap.size);
       console.log('done!');
