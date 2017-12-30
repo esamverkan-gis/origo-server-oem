@@ -167,9 +167,12 @@ module.exports = function(options) {
             let styleType = this.style_type;
             if (styleType == 'stroke') {
               obj.stroke = {};
-              obj.fill = {};
               obj.stroke.color = this.stroke_color;
-              obj.fill.color = this.fill_color;
+              obj.stroke.width = this.width
+              if (this.fill_color) {
+                obj.fill = {};                
+                obj.fill.color = this.fill_color;
+              }
             }
             if (styleType == 'circle') {
               obj.circle = {};
