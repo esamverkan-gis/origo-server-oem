@@ -8,13 +8,6 @@ var mapStateRouter = require('./routes/mapstate');
 
 var app = express();
 
-var server = app.listen(3001, function () {
-  var host = server.address().address
-  var port = server.address().port
-
-  console.log('Origo server listening at http://%s:%s', host, port)
-});
-
 //Workaround to set __dirname properly when using node-windows
 process.chdir(__dirname);
 
@@ -49,4 +42,16 @@ app.use(function(err, req, res, next) {
     res.render('500');
 });
 
+var server = app.listen(3001, function () {
+    var host = server.address().address
+    var port = server.address().port
+  
+    console.log('Origo server listening at http://%s:%s', host, port)
+  });
+
+process.on('SIGINT', () => {
+    console.log('Received SIGINT.  Press Control-D to exit.');
+    process.exit();
+});
+  
 module.exports = app;
