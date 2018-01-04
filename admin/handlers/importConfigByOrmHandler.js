@@ -8,8 +8,10 @@ var fs = require('fs');
 var createStyleObject = require('./createStyleObject');
 
 var importConfigByOrm = function (req, res) {
-  console.log(req.body);
-  console.log("Req.files:" + req.files);
+  // console.log("req.body: ")
+  // console.log(req.body);
+  // console.log("req.files: ")
+  // console.log(req.files);
   if (req.files) {
     console.log("Importerar från req.files");
     //TODO: SANITYCHECK
@@ -20,6 +22,8 @@ var importConfigByOrm = function (req, res) {
         importJsonData(req, res);
       } catch (err) {
         console.log(err);
+         // exceptionMessage is used in order to signal adminapi that there is an error, see method of basePostFormAsMultiData in adminapi.
+        res.status(400).json({ exceptionMessage: 'Någonting gick fel! se till att filen har korrekt innehåll samt den är av typ json.'});
       }
     }
   }
@@ -299,7 +303,7 @@ function importJsonData (req, res) {
         let source = savedSources.get(layer.source);
         if (!source) {
           console.log('layer ' + layer.name + ' has no source or source deos not exist in source!');
-          reject(Error('layer ' + layer.name + ' has no source or source deos not exist in source!'));
+          reject(Error('layer ' + layer.name + ' has no source or source deos not exist in sources!'));
           return;
         }
         let style = savedStyles.get(layer.style);
@@ -419,6 +423,9 @@ function importJsonData (req, res) {
     // exceptionMessage is used in order to signal adminapi that there is an error, see method of basePostFormAsMultiData in adminapi.
     res.status(400).json({ exceptionMessage: error.message });
     // catch(console.log.bind(console)); // <-- this is badass
+
+    // TODO: domainRouter.route('/removeConfigGraph/:configId')
+    // the already saved config and its groups should be removed from the data base otherwise they will apear in the config list with next page refresh!
   });
 }
 
