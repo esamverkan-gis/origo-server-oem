@@ -3,6 +3,7 @@
 "use strict";
 
 var orm = require('orm');
+// var _ = require('lodash');
 
 var exportConfigByOrm = function (req, res) {
 
@@ -75,10 +76,9 @@ var exportConfigByOrm = function (req, res) {
           console.log('Number of controls : ' + controls.length);
           // there is bug in Origo that need to have "mapmenu" before "legend" in the list of controls! because of that we need to sort it so that mapmeu comes first.
           controls.sort(function (a, b) {
-            if (a.name < b.name) return 1;
-            if (a.name > b.name) return -1;
-            return 0;
-          });
+            if (a.name == 'mapmenu') return -1;
+            else return 1;
+        });
         }
         for (let control of controls) {
           index.controls.push(control.createJsonObject());
