@@ -4,9 +4,9 @@ var express = require('express');
 var domainRouter = express.Router();
 var orm = require('orm');
 var _ = require('lodash');
-var helperFunctions = require('./handlers/serverHelperFunctions');
+var helperFunctions = require('./handlers/helperFunctions');
 var xmlParser = require('xml2js').parseString;
-var jsonRefiner = require('./handlers/jsonRefiner');
+var formatter = require('./handlers/formatter');
 
 // req.models is a reference to models that ar defined in models.js and used as a middleware in admin.js
 
@@ -348,7 +348,7 @@ domainRouter.route('/fetchAttributeFromServer')
     helperFunctions.fetchData(describeFeatureTypeUrl)
       .then(function (response) {
         xmlParser(response, function (err, jsonAttribute) {
-          var attributes = jsonRefiner.Attribute(jsonAttribute);
+          var attributes = formatter.Attribute(jsonAttribute);
           // console.log(attributes);
           res.setHeader('Content-type', 'application/json');
           res.status(200).json(attributes);

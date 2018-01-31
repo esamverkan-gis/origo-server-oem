@@ -5,7 +5,7 @@
 var orm = require('orm');
 // var _ = require('lodash');
 
-var exportConfigByOrm = function (req, res) {
+var exportConfig = function (req, res) {
 
   var exportStyle = 'origo';
 
@@ -285,4 +285,4 @@ function prettifyJson (jsonStr) {
     return jsonStr;
   }
 }
-module.exports = exportConfigByOrm;
+module.exports = exportConfig;

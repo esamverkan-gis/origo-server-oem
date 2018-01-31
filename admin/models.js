@@ -81,13 +81,15 @@ module.exports = function(options) {
       var Source = db.define("source", {
         name: String,
         url: String,
-        version: String
+        version: String,
+        service: String
       }, {
         methods: {
           createJsonObject: function() {
             let obj = {};
             obj.url = this.url;
             obj.version = this.version;
+            obj.service = this.service;
             return obj;
           }
         },

@@ -1,11 +1,74 @@
-module.exports = function(req, response) {
+module.exports = function (req, response) {
 
-  var xmlParser = require('xml2js').parseString;
-  var helperFunctions = require('./serverHelperFunctions');
-  var jsonRefiner = require('./jsonRefiner');
-  var url = req.query.url;
+  var xml2js = require('xml2js');
+  var helperFunctions = require('./helperFunctions');
+  var formatter = require('./formatter');
+  // var url = req.query.url;
+  var source = req.body;
+  var url = source.url;
 
-  let parseXMLfromGeoserver = function(rawData) {
+  let parseXMLfromGeoserver = function (rawData) {
+    const parser = new xml2js.Parser({ explicitArray: false, mergeAttrs: false, stripPrefix: true });
+    parser.parseString(rawData, function (err, result) {
+
+      console.log(result);
+      var geoServerLayers;
+      // different versions of WMS have slightly different xml schemes.
+      if (result.WMS_Capabilities) {
+        console.log('Number of all layers fetched: ' + result.WMS_Capabilities.Capability.Layer.Layer.length);
+        geoServerLayers = result.WMS_Capabilities.Capability.Layer.Layer;
+
+      } else if (result.WMT_MS_Capabilities) {
+        console.log('Number of all layers fetched: ' + result.WMT_MS_Capabilities.Capability.Layer.Layer.length);
+        geoServerLayers = result.WMT_MS_Capabilities.Capability.Layer.Layer;
+
+      } else if (result.WFS_Capabilities) {
+        console.log('Number of all layers fetched: ' + result.WFS_Capabilities.FeatureTypeList.FeatureType.length);
+        geoServerLayers = result.WFS_Capabilities.FeatureTypeList.FeatureType;
+
+      } else if (result['wfs:WFS_Capabilities']) {
+        console.log('Number of all layers fetched: ' + result['wfs:WFS_Capabilities']['wfs:FeatureTypeList']['wfs:FeatureType'].length);
+        geoServerLayers = result['wfs:WFS_Capabilities']['wfs:FeatureTypeList']['wfs:FeatureType'];
+
+      } else {
+        response.send(JSON.stringify('no service for this url or request parameters!'));
+        return;
+      }
+
+      // here geoServer layers are converted to proper format 
+      var layers = geoServerLayers.map(function (geoServerLayer) {
+        return new formatter.Layer(geoServerLayer);
+      });
+      response.json(layers);
+      // response.json(geoServerLayers);
+    });
+  }
+
+  var getCapabilitiesUrl = helperFunctions.fixUrlforGetCapabilities(source);
+  // var getCapabilitiesUrl = url + '?request=getcapabilities' + '&service=wfs';
+  console.log(getCapabilitiesUrl);
+
+  helperFunctions.fetchData(getCapabilitiesUrl)
+    .then(parseXMLfromGeoserver)
+    .catch(function (err) {
+      response.json(err.message);
+      console.log('from layers catch: ' + err);
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ let parseXMLfromGeoserver = function(rawData) {
     xmlParser(rawData, function(err, result) {
 
       var geoServerLayers;
@@ -27,7 +90,7 @@ module.exports = function(req, response) {
 
       // here geoServer layers are converted to proper format 
       var myLayers = geoServerLayers.map(function(geoServerLayer) {
-        return new jsonRefiner.Layer(geoServerLayer);
+        return new formatter.Layer(geoServerLayer);
       });
 
       // here arrributes are fetched for queryable layers, attributes are in xml format
@@ -60,7 +123,7 @@ module.exports = function(req, response) {
           } else {
             // here arributes are converted to json format, xmlParser returns undefined for those values that are not xml
             xmlParser(att, function(err, jsonAttribute) {
-              myLayers[index].attributes = jsonRefiner.Attribute(jsonAttribute);
+              myLayers[index].attributes = formatter.Attribute(jsonAttribute);
             });
           }
         });
@@ -74,10 +137,4 @@ module.exports = function(req, response) {
       });
     });
   }
-
-  var getCapabilitiesUrl = helperFunctions.fixUrlforGetCapabilities(url);
-  helperFunctions.fetchData(getCapabilitiesUrl).then(parseXMLfromGeoserver).catch(function(err) {
-    response.send(JSON.stringify(err.message));
-    console.log('from layers catch: ' + err.message);
-  });
-}
+*/

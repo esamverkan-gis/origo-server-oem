@@ -7,7 +7,7 @@ var fs = require('fs');
 
 var createStyleObject = require('./createStyleObject');
 
-var importConfigByOrm = function (req, res) {
+var importConfig = function (req, res) {
   // console.log("req.body: ")
   // console.log(req.body);
   // console.log("req.files: ")
@@ -243,7 +243,8 @@ function importJsonData (req, res) {
             data.push({
               name: sourceName,
               url: sources[sourceName].url,
-              version: sources[sourceName].version
+              version: sources[sourceName].version,
+              service: sources[sourceName].service
             });
           }
         }
@@ -429,4 +430,4 @@ function importJsonData (req, res) {
   });
 }
 
-module.exports = importConfigByOrm;
+module.exports = importConfig;

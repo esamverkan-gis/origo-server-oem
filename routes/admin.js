@@ -62,34 +62,22 @@ adminRouter.use('/attribute', attributeRouter);
 adminRouter.use('/proj4defs', proj4defsRouter);
 adminRouter.use('/domain', domainRouter);
 
-//*********************************************************************ExportConfig********************************************************************
+//*********************************************************************ExportConfig**********************************************************************
 // read data from database and create index.json 
-var exportConfigByOrmHandler = require('../admin/handlers/exportConfigByOrmHandler');
-// adminRouter.get('/exportConfig/:configName', exportConfigByOrmHandler);
-adminRouter.get('/exportConfig/:configId', exportConfigByOrmHandler);
+var exportConfig = require('../admin/handlers/exportConfig');
+// adminRouter.get('/exportConfig/:configName', exportConfig');
+adminRouter.get('/exportConfig/:configId', exportConfig);
 
-//********************************************************************importConfig********************************************************************************
+//********************************************************************importConfig**************************************************************************
 // read the index.json from body, form the corresponding objects and save them in the database
-var importConfigByOrmHandler = require('../admin/handlers/importConfigByOrmHandler');
-adminRouter.options('/importConfig',function (req, res, next) {
+var importConfig = require('../admin/handlers/importConfig');
+adminRouter.options('/importConfig', function (req, res, next) {
     res.sendStatus(200);
 });
-adminRouter.post('/importConfig', importConfigByOrmHandler);
+adminRouter.post('/importConfig', importConfig);
 
-// *************************************************************************getCapabilities*************************************************************************
-/*
-Example source urls from index.json:
-+ https://extmaptest.sundsvall.se/service/gwc/geoserver/wms
-+ http://extmaptest.sundsvall.se/geoserver/wms
-+ http://maps3.sgu.se/geoserver/ows
-- http://gis-services.metria.se/arcgis/rest/services/msb/InspireMSB_Oversvamning_Oversiktliga/MapServer/exts/InspireView/service?(there are layers under main layer! V:1.3.0)
-- http://nvpub.vic-metria.nu/arcgis/services/Naturvardsregistret/MapServer/WmsServer?(there are layers under main layer! V:1.3.0)
-+ http://geo-netinfo.trafikverket.se/MapService/wms.axd/NetInfo?SERVICE=WMS&
-+ http://extmaptest.sundsvall.se/geoserver/wfs
-+ https://extmap.sundsvall.se:443/geoserver/gwc/service/wms?SERVICE=WMS&
-+ http://extmaptest.sundsvall.se/geoserver/wms
-*/
-var getLayersFromCapabilitiesHandler = require('../admin/handlers/getLayersFromCapabilitiesHandler');
-adminRouter.get('/getLayersFromCapabilities', getLayersFromCapabilitiesHandler);
+// *******************************************************************getCapabilities*********************************************************************** 
+var getLayersFromCapabilities = require('../admin/handlers/getLayersFromCapabilities');
+adminRouter.post('/getLayersFromCapabilities', getLayersFromCapabilities);
 
 module.exports = adminRouter;

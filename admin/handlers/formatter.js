@@ -2,33 +2,33 @@
 
 var _ = require('lodash');
 
-/*
-  layers parsed with xmlParser have a special format that is values for each property sits in an array! 
-  for example "name" : ["skolor"]
-  this module makes proper json objects. 
-*/
+var Layer = function (geoServerLayer) {
 
-var Layer = function(geoServerLayer) {
+  if (geoServerLayer.hasOwnProperty('Name'))
+    this.name = geoServerLayer.Name;
+  else if (geoServerLayer.hasOwnProperty('wfs:Name'))
+    this.name = geoServerLayer['wfs:Name'];
 
-  if (geoServerLayer.hasOwnProperty('Name')) this.name = geoServerLayer.Name[0];
-  if (geoServerLayer.hasOwnProperty('Title')) this.title = geoServerLayer.Title[0];
-  if (geoServerLayer.hasOwnProperty('Abstract')) this.abstract = geoServerLayer.Abstract[0];
-  if (geoServerLayer.hasOwnProperty('CRS')) this.CRS = geoServerLayer.CRS[0];
-  if (geoServerLayer.hasOwnProperty('id')) this.id = geoServerLayer.id[0];
-  if (geoServerLayer.hasOwnProperty('format')) this.format = geoServerLayer.format[0];
+  if (geoServerLayer.hasOwnProperty('Title'))
+    this.title = geoServerLayer.Title;
+  else if (geoServerLayer.hasOwnProperty('wfs:Title'))
+    this.title = geoServerLayer['wfs:Title'];
+
+  if (geoServerLayer.hasOwnProperty('Abstract')) this.abstract = geoServerLayer.Abstract;
+  if (geoServerLayer.hasOwnProperty('CRS')) this.CRS = geoServerLayer.CRS;
+  if (geoServerLayer.hasOwnProperty('id')) this.id = geoServerLayer.id;
+  if (geoServerLayer.hasOwnProperty('format')) this.format = geoServerLayer.format;
   if (geoServerLayer.hasOwnProperty('$')) {
     if (geoServerLayer.$.hasOwnProperty('queryable')) this.queryable = setTrueOrFalse(geoServerLayer.$.queryable);
   }
 }
 
-function setTrueOrFalse(value) {
-  if (value == 0) return false;
+function setTrueOrFalse (value) {
+  if (value === 0 || value === "0") return false;
   else return true;
 }
 
-// var counter = 1;
-var Attribute = function(geoServerAttribute) {
-
+var Attribute = function (geoServerAttribute) {
   var path = 'xsd:schema.xsd:complexType[0].xsd:complexContent[0].xsd:extension[0].xsd:sequence[0].xsd:element';
   if (_.has(geoServerAttribute, path)) {
     var elements = _.get(geoServerAttribute, path);
@@ -37,15 +37,15 @@ var Attribute = function(geoServerAttribute) {
       attArray.push(element.$);
     }
     return attArray;
-    
+
     // console.log(counter++);
   } else if (_.has(geoServerAttribute, 'ows:ExceptionReport')) {
     return {
-      message : 'no attributes was available for this layer, or server has another format than (request=DescribeFeatureType&typename=layerName)'
+      message: 'no attributes was available for this layer, or server has another format than (request=DescribeFeatureType&typename=layerName)'
     }
   } else {
     return {
-      message : 'provided path to the elements did not exist. (propably map server is using another version)'
+      message: 'provided path to the elements did not exist. (propably map server is using another version)'
     }
   }
 }
