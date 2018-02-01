@@ -29,7 +29,6 @@ function setTrueOrFalse (value) {
 }
 
 var Attribute = function (geoServerAttribute) {
-
   
   if (geoServerAttribute['xsd:schema']) {
     var path = 'xsd:schema.xsd:complexType.xsd:complexContent.xsd:extension.xsd:sequence.xsd:element';
@@ -50,15 +49,15 @@ var Attribute = function (geoServerAttribute) {
     if (_.has(geoServerAttribute, 'ows:ExceptionReport.ows:Exception.ows:ExceptionText')) {
       var ExceptionText = _.get(geoServerAttribute, 'ows:ExceptionReport.ows:Exception.ows:ExceptionText');
       return {
-        message: ExceptionText
+        exceptionMessage: ExceptionText
       }
     }
     return {
-      message: 'no attributes was available for this layer, or server has another format than (request=DescribeFeatureType&typename=layerName)'
+      exceptionMessage: 'no attributes was available for this layer, or server has another format than (request=DescribeFeatureType&typename=layerName)'
     }
   } else {
     return {
-      message: 'provided path to the elements did not exist. (propably map server is using another version)'
+      exceptionMessage: 'provided path to the elements did not exist. (propably map server is using another version)'
     }
   }
 }

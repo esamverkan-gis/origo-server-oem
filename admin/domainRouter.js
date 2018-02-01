@@ -299,8 +299,8 @@ domainRouter.route('/removeLayerGraph/:layerId')
   .delete(function (req, res, next) {
     const layerId = req.params.layerId;
     req.models.Layer.get(layerId, function (err, layer) {
-      if (err) res.sendStatus(500);      
-      if (!layer) res.sendStatus(404);      
+      if (err) res.sendStatus(500);
+      if (!layer) res.sendStatus(404);
       layer.getStyle(function (err, style) {
         if (err)
           console.log('error getting style for layer id = ' + layer.id);
@@ -321,7 +321,7 @@ domainRouter.route('/removeLayerGraph/:layerId')
         }
         else {
           console.log('layer removed, id : ' + layer.id);
-          res.status(200).json({});          
+          res.status(200).json({});
         }
       });
     })
@@ -342,7 +342,7 @@ domainRouter.route('/fetchAttributeFromServer')
 
     var source = req.body.source;
     var layerName = req.body.layerName;
-    
+
     var describeFeatureTypeUrl = helperFunctions.fixUrlforDescribeFeaturType(source, layerName);
     // console.log(describeFeatureTypeUrl);
     helperFunctions.fetchData(describeFeatureTypeUrl)
@@ -350,7 +350,6 @@ domainRouter.route('/fetchAttributeFromServer')
         const parser = new xml2js.Parser({ explicitArray: false, mergeAttrs: false, stripPrefix: true });
         parser.parseString(response, function (err, jsonAttribute) {
 
-          console.log(jsonAttribute);
           var attributes = formatter.Attribute(jsonAttribute);
           // console.log(attributes);
           res.setHeader('Content-type', 'application/json');
@@ -360,10 +359,11 @@ domainRouter.route('/fetchAttributeFromServer')
       .catch(function (err) {
         console.log(err);
         res.setHeader('Content-type', 'application/json');
-        res.status(500).json([]);
+        res.status(500).json({
+          exceptionMessage: err.message
+        });
       });
   });
-
 
 domainRouter.route('/fetchConfigStyles/:configId')
   .all(function (req, res, next) {
