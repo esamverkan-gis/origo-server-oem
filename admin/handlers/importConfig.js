@@ -22,8 +22,8 @@ var importConfig = function (req, res) {
         importJsonData(req, res);
       } catch (err) {
         console.log(err);
-         // exceptionMessage is used in order to signal adminapi that there is an error, see method of basePostFormAsMultiData in adminapi.
-        res.status(400).json({ exceptionMessage: 'Någonting gick fel! se till att filen har korrekt innehåll samt den är av typ json.'});
+        // exceptionMessage is used in order to signal adminapi that there is an error, see method of basePostFormAsMultiData in adminapi.
+        res.status(400).json({ exceptionMessage: 'Någonting gick fel! se till att filen har korrekt innehåll samt den är av typ json.' });
       }
     }
   }
@@ -235,13 +235,30 @@ function importJsonData (req, res) {
         for (let sourceName of Object.keys(sources)) {
           var sourceFromDatabase = sourcesFromDatabase.find(function (item) {
             return item.url == sources[sourceName].url &&
-                   item.version == sources[sourceName].version &&
-                   item.service == sources[sourceName].service;
+              item.version == sources[sourceName].version &&
+              item.service == sources[sourceName].service;
           });
           if (sourceFromDatabase) {
             console.log('source "' + sourceName + '" already exist by the name : ' + sourceFromDatabase.name);
             savedSources.set(sourceName, sourceFromDatabase);
           } else {
+
+            if (!sources[sourceName].url) {
+              console.log('source ' + sourceName + ' has no url.');
+              reject(Error('source ' + sourceName + ' has no url.'));
+              return;
+            }
+            if (!sources[sourceName].version) {
+              console.log('source ' + sourceName + ' has no version.');
+              reject(Error('source ' + sourceName + ' has no version.'));
+              return;
+            }
+            if (!sources[sourceName].service) {
+              console.log('source ' + sourceName + ' has no service type.');
+              reject(Error('source ' + sourceName + ' has no service type.'));
+              return;
+            }
+
             data.push({
               name: sourceName,
               url: sources[sourceName].url,
