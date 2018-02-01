@@ -5,7 +5,7 @@ var domainRouter = express.Router();
 var orm = require('orm');
 var _ = require('lodash');
 var helperFunctions = require('./handlers/helperFunctions');
-var xmlParser = require('xml2js').parseString;
+var xml2js = require('xml2js');
 var formatter = require('./handlers/formatter');
 
 // req.models is a reference to models that ar defined in models.js and used as a middleware in admin.js
@@ -338,16 +338,19 @@ domainRouter.route('/fetchAttributeFromServer')
   .options(function (req, res, next) {
     res.sendStatus(200);
   })
-  .get(function (req, res, next) {
+  .post(function (req, res, next) {
 
-    var url = req.query.url;
-    var layerName = req.query.layerName;
-
-    var describeFeatureTypeUrl = helperFunctions.fixUrlforDescribeFeaturType(url, layerName);
+    var source = req.body.source;
+    var layerName = req.body.layerName;
+    
+    var describeFeatureTypeUrl = helperFunctions.fixUrlforDescribeFeaturType(source, layerName);
     // console.log(describeFeatureTypeUrl);
     helperFunctions.fetchData(describeFeatureTypeUrl)
       .then(function (response) {
-        xmlParser(response, function (err, jsonAttribute) {
+        const parser = new xml2js.Parser({ explicitArray: false, mergeAttrs: false, stripPrefix: true });
+        parser.parseString(response, function (err, jsonAttribute) {
+
+          console.log(jsonAttribute);
           var attributes = formatter.Attribute(jsonAttribute);
           // console.log(attributes);
           res.setHeader('Content-type', 'application/json');

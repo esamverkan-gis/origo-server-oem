@@ -117,7 +117,8 @@ var fixUrlforDescribeFeaturType = function (source, layerName) {
     }
   }
 
-  fixedUrl = host + '?request=DescribeFeatureType&typename=' + layerName + '&service=' + source.service + '&version=' + source.version;
+  fixedUrl = host + '?request=DescribeFeatureType&typename=' + layerName + '&service=wfs&version=' + source.version;
+  console.log(fixedUrl);
   return fixedUrl;
 }
 

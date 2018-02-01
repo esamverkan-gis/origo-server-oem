@@ -29,7 +29,14 @@ function setTrueOrFalse (value) {
 }
 
 var Attribute = function (geoServerAttribute) {
-  var path = 'xsd:schema.xsd:complexType[0].xsd:complexContent[0].xsd:extension[0].xsd:sequence[0].xsd:element';
+
+  
+  if (geoServerAttribute['xsd:schema']) {
+    var path = 'xsd:schema.xsd:complexType.xsd:complexContent.xsd:extension.xsd:sequence.xsd:element';
+  } else if (geoServerAttribute['xs:schema']) {
+    var path = 'xs:schema.xs:complexType.xs:complexContent.xs:extension.xs:sequence.xs:element';
+  }  
+
   if (_.has(geoServerAttribute, path)) {
     var elements = _.get(geoServerAttribute, path);
     var attArray = [];
@@ -40,6 +47,12 @@ var Attribute = function (geoServerAttribute) {
 
     // console.log(counter++);
   } else if (_.has(geoServerAttribute, 'ows:ExceptionReport')) {
+    if (_.has(geoServerAttribute, 'ows:ExceptionReport.ows:Exception.ows:ExceptionText')) {
+      var ExceptionText = _.get(geoServerAttribute, 'ows:ExceptionReport.ows:Exception.ows:ExceptionText');
+      return {
+        message: ExceptionText
+      }
+    }
     return {
       message: 'no attributes was available for this layer, or server has another format than (request=DescribeFeatureType&typename=layerName)'
     }
@@ -70,4 +83,16 @@ format of response from geoserver is like this before it is converted to JSON:
   </xsd:complexType>
 <xsd:element name="adress_sok" substitutionGroup="gml:AbstractFeature" type="sok:adress_sokType"/>
 </xsd:schema>
+*/
+
+
+
+/*
+format of exception:
+
+<ows:ExceptionReport xmlns:ows="http://www.opengis.net/ows" version="1.1.0" language="en">
+  <ows:Exception exceptionCode="NoApplicableCode">
+    <ows:ExceptionText>Unknown operation name.</ows:ExceptionText>
+  </ows:Exception>
+</ows:ExceptionReport>
 */
