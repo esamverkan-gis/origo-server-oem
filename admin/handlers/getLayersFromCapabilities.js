@@ -26,9 +26,13 @@ module.exports = function (req, response) {
         console.log('Number of all layers fetched: ' + result.WFS_Capabilities.FeatureTypeList.FeatureType.length);
         geoServerLayers = result.WFS_Capabilities.FeatureTypeList.FeatureType;
 
-      } else if (result['wfs:WFS_Capabilities']) {
+      } else if (result['wfs:WFS_Capabilities'] && result['wfs:WFS_Capabilities']['wfs:FeatureTypeList']) {
         console.log('Number of all layers fetched: ' + result['wfs:WFS_Capabilities']['wfs:FeatureTypeList']['wfs:FeatureType'].length);
         geoServerLayers = result['wfs:WFS_Capabilities']['wfs:FeatureTypeList']['wfs:FeatureType'];
+
+      } else if (result['wfs:WFS_Capabilities'] && result['wfs:WFS_Capabilities']['FeatureTypeList']) {
+        console.log('Number of all layers fetched: ' + result['wfs:WFS_Capabilities']['FeatureTypeList']['FeatureType'].length);
+        geoServerLayers = result['wfs:WFS_Capabilities']['FeatureTypeList']['FeatureType'];
 
       } else {
         response.send(JSON.stringify('no service for this url or request parameters!'));
