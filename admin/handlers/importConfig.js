@@ -234,7 +234,9 @@ function importJsonData (req, res) {
         var data = [];
         for (let sourceName of Object.keys(sources)) {
           var sourceFromDatabase = sourcesFromDatabase.find(function (item) {
-            return item.url == sources[sourceName].url;
+            return item.url == sources[sourceName].url &&
+                   item.version == sources[sourceName].version &&
+                   item.service == sources[sourceName].service;
           });
           if (sourceFromDatabase) {
             console.log('source "' + sourceName + '" already exist by the name : ' + sourceFromDatabase.name);
