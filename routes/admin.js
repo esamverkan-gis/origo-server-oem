@@ -80,4 +80,8 @@ adminRouter.post('/importConfig', importConfig);
 var getLayersFromCapabilities = require('../admin/handlers/getLayersFromCapabilities');
 adminRouter.post('/getLayersFromCapabilities', getLayersFromCapabilities);
 
+adminRouter.get('/test', function(req, res) {
+    res.send('test works!');
+});
+
 module.exports = adminRouter;
