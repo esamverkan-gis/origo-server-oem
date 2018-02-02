@@ -100,7 +100,8 @@ module.exports = function(options) {
         name: String,
         title: String,
         url: String,
-        url_title: String
+        url_title: String,
+        html: String
       }, {
         methods: {},
         validations: {}

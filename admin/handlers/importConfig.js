@@ -382,7 +382,8 @@ function importJsonData (req, res) {
             title: attribute.title,
             url: attribute.url,
             url_title: attribute.urltitle,
-            layer_id: savedLayer.id
+            layer_id: savedLayer.id,
+            html: attribute.html
           });
         }
       }

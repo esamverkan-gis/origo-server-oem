@@ -229,6 +229,7 @@ var exportConfig = function (req, res) {
                       if (attribute.title) attJsonObj.title = attribute.title;
                       if (attribute.url) attJsonObj.url = attribute.url;
                       if (attribute.url_title) attJsonObj.urltitle = attribute.url_title;
+                      if (attribute.html) attJsonObj.html = attribute.html;
                       layerJsonObj.attributes.push(attJsonObj);
                     }
                   }
