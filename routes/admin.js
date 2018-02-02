@@ -81,7 +81,7 @@ var getLayersFromCapabilities = require('../admin/handlers/getLayersFromCapabili
 adminRouter.post('/getLayersFromCapabilities', getLayersFromCapabilities);
 
 adminRouter.get('/test', function(req, res) {
-    res.send('test works!');
+    res.send('test works too!');
 });
 
 module.exports = adminRouter;
