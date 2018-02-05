@@ -40,7 +40,7 @@ mapstateRouter.post('/', function (req, res) {
             console.log(err.message);
             res.set(500).send(err.message);
         } else {
-            console.log('mapstate file : ' + mapstateId + 'was written successfully.');            
+            console.log('mapstate file : ' + mapstateId + ' was written successfully.');            
             res.send(JSON.stringify({ "mapStateId": mapstateId }));
         }
     });
@@ -54,7 +54,7 @@ mapstateRouter.get('/:mapstateId', function (req, res) {
             console.log(err.message);
             res.set(500).send(err.message);
         } else {
-            console.log('mapstate file : ' + mapstateId + 'was read successfully.');
+            console.log('mapstate file : ' + mapstateId + ' was read successfully.');
             res.send(data);
         }
     });
