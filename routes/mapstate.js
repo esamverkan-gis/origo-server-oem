@@ -34,9 +34,14 @@ mapstateRouter.post('/', function (req, res) {
     //TODO CLean data!!!
     var mapstateId = uuidV4();
     var stateObject = req.body;
-
+    console.log(mapstateId);
     fs.writeFile(getFileName(mapstateId), JSON.stringify(req.body), function (err) {
-        res.end(JSON.stringify({ "mapStateId": mapstateId }));
+        if (err) {
+            console.log(err.message);
+            res.set(500).send(err.message);            
+        } else {
+            res.end(JSON.stringify({ "mapStateId": mapstateId }));
+        }
     });
 });
 
@@ -62,7 +67,9 @@ function getFileName (mapstateId) {
     if (!fs.existsSync(storageDir)) {
         fs.mkdirSync(storageDir);
     }
-    return fileName = storageDir + "/" + "mapstate-" + mapstateId + ".json";
+    var fileName = storageDir + "/" + "mapstate-" + mapstateId + ".json";
+    console.log(fileName);
+    return fileName;
 }
 
 module.exports = mapstateRouter;
