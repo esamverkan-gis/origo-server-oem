@@ -38,9 +38,10 @@ mapstateRouter.post('/', function (req, res) {
     fs.writeFile(getFileName(mapstateId), JSON.stringify(req.body), function (err) {
         if (err) {
             console.log(err.message);
-            res.set(500).send(err.message);            
+            res.set(500).send(err.message);
         } else {
-            res.end(JSON.stringify({ "mapStateId": mapstateId }));
+            console.log('mapstate file : ' + mapstateId + 'was written successfully.');            
+            res.send(JSON.stringify({ "mapStateId": mapstateId }));
         }
     });
 });
@@ -49,7 +50,13 @@ mapstateRouter.get('/:mapstateId', function (req, res) {
     //TODO: SANITY CHECK AND ALL THAT STUFF   
     var mapstateId = req.params["mapstateId"];
     fs.readFile(getFileName(mapstateId), function (err, data) {
-        res.end(data);
+        if (err) {
+            console.log(err.message);
+            res.set(500).send(err.message);
+        } else {
+            console.log('mapstate file : ' + mapstateId + 'was read successfully.');
+            res.send(data);
+        }
     });
 });
 
