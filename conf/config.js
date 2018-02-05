@@ -22,7 +22,7 @@ module.exports = {
     }
   },
   mapState: {
-    'absolutePathStorage': 'C:/origoMapState'
+    'storagePath': './../OrigoMapState'
   }, 
   adminDataBase: {
     // Will be used in the file OrigoServer/admin/models.js to point to the database, but the strange is that it starts from root of OrigoServer
