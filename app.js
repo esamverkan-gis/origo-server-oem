@@ -46,7 +46,7 @@ var server = app.listen(3001, function () {
     var host = server.address().address
     var port = server.address().port
   
-    console.log('Origo server listening at http://%s:%s', host, port)
+    console.log('Origo server listening at http://%s:%s %s', host, port, new Date())
   });
 
 process.on('SIGINT', () => {
