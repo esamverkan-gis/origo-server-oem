@@ -28,7 +28,7 @@ var exportConfig = function (req, res) {
 
   index.groups = [];
   // var groupsMap = new Map();
-  var groups = [];  
+  var groups = [];
   index.source = {};
   var sourcesMap = new Map();
   index.styles = {};
@@ -78,7 +78,7 @@ var exportConfig = function (req, res) {
           controls.sort(function (a, b) {
             if (a.name == 'mapmenu') return -1;
             else return 1;
-        });
+          });
         }
         for (let control of controls) {
           index.controls.push(control.createJsonObject());
@@ -92,7 +92,7 @@ var exportConfig = function (req, res) {
 
         if (groupss) {
           console.log('Number of groups : ' + groupss.length);
-         // TODO: sorting groups
+          // TODO: sorting groups
         }
         for (let grp of groupss) {
           groups.push(grp.createJsonObject());
@@ -129,7 +129,7 @@ var exportConfig = function (req, res) {
           resolve();
 
         } else if (exportStyle === 'origo') {
-          
+
           console.log(groups);
           let findParent = function (group, groups) {
             let res = null;
@@ -176,17 +176,19 @@ var exportConfig = function (req, res) {
         var layersPromises = [];
         for (let layer of layers) {
           layersPromises.push(new Promise(function (resolve, reject) {
-
             let layerJsonObj = layer.createJsonObject();
             let groupPromise = function () {
               return new Promise(function (resolve, reject) {
                 layer.getGroup(function (err, group) {
-                  if (!group) reject(new Error('layer "' + layer.name + '" has no group.'));
-                  layerJsonObj.group = group.name;
-                  // groupsMap.set(group.name, group.createJsonObject());
-                  // we need to save the groups in a map to avoid saving the same group several times! if we push directly every layer will have a group!
-                  // index.groups.push(group.createJsonObject()); 
-                  resolve();
+                  if (!group) {
+                    reject(new Error('layer "' + layer.name + '" has no group.'));
+                  } else {
+                    layerJsonObj.group = group.name;
+                    // groupsMap.set(group.name, group.createJsonObject());
+                    // we need to save the groups in a map to avoid saving the same group several times! if we push directly every layer will have a group!
+                    // index.groups.push(group.createJsonObject()); 
+                    resolve();
+                  }
                 });
               });
             }
@@ -194,11 +196,14 @@ var exportConfig = function (req, res) {
             let sourcePromise = function () {
               return new Promise(function (resolve, reject) {
                 layer.getSource(function (err, source) {
-                  if (!source) reject(new Error('layer "' + layer.name + '" has no source.'));
-                  layerJsonObj.source = source.name;
-                  index.source[source.name] = source.createJsonObject();
-                  sourcesMap.set(source.name, source.createJsonObject());
-                  resolve();
+                  if (!source) {
+                    reject(new Error('layer "' + layer.name + '" has no source.'));
+                  } else {
+                    layerJsonObj.source = source.name;
+                    index.source[source.name] = source.createJsonObject();
+                    sourcesMap.set(source.name, source.createJsonObject());
+                    resolve();
+                  }
                 });
               });
             }
@@ -206,14 +211,17 @@ var exportConfig = function (req, res) {
             let stylePromise = function () {
               return new Promise(function (resolve, reject) {
                 layer.getStyle(function (err, style) {
-                  if (!style) reject(new Error('layer "' + layer.name + '" has no style.'));
-                  layerJsonObj.style = style.name;
-                  let arr = [];
-                  arr[0] = [];
-                  arr[0].push(style.createJsonObject());
-                  index.styles[style.name] = arr;
-                  stylesMap.set(style.name, style.createJsonObject());
-                  resolve();
+                  if (!style) {
+                    reject(new Error('layer "' + layer.name + '" has no style.'));
+                  } else {
+                    layerJsonObj.style = style.name;
+                    let arr = [];
+                    arr[0] = [];
+                    arr[0].push(style.createJsonObject());
+                    index.styles[style.name] = arr;
+                    stylesMap.set(style.name, style.createJsonObject());
+                    resolve();
+                  }
                 });
               });
             }
