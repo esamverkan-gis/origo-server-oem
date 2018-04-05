@@ -31,21 +31,26 @@ module.exports = function(options) {
           },
           // this method finds a layer (just any layer) that belongs to this group, then returns its config_id.
           // this way, we can simply get the config for each group's id! :)
-          getConfig: function() {
+          // getConfig is adefaul function in orm, therefore added x!
+          getConfigx: function() { 
             let that = this;
             return new Promise(function(resolve, reject) {
               Layer.find({ group_id: that.id }, function(err, layers) {
-                if (err) reject();
+                if (err) {
+                  reject();
+                  return;
+                }
                 if (layers.length == 0) {
                   console.log('group ' + that.name + ' with id : ' + that.id + ' does not belong to any layer.');
                   reject('group ' + that.name + ' with id : ' + that.id + ' does not belong to any layer.');
+                  return;
                 } else {
                   console.log(`group "${that.name}" with id : ${that.id} belongs to config : ${layers[0].config_id}`);
                   resolve(layers[0].config_id);
                 }
               });
             });
-          }
+          } 
         },
         validations: {}
       });

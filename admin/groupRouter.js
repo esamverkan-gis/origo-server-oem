@@ -89,13 +89,14 @@ groupRouter.route('/:id')
       if (groups.length == 0)
         res.sendStatus(404);
       else {
-        groups[0].getConfig().then(function (configId) {
+      // this is unneccessary because the config_id is already available in the group object!
+       groups[0].getConfigx().then(function (configId) {
           // config id for this group is available here. (ready for later use!)
           res.status(200).json(groups);
         }).catch(function () {
           // even if promise for finding the config is rejected, we are still interested in groups, so we return them anyway!
           res.status(200).json(groups);
-        });
+        }); 
       }
     });
   })
