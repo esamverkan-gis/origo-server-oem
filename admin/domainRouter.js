@@ -365,6 +365,96 @@ domainRouter.route('/fetchAttributeFromServer')
       });
   });
 
+domainRouter.route('/updateSortOrderAndParentOfLayersAndGroups')
+  .all(function (req, res, next) {
+    // runs for all HTTP verbs first
+    // think of it as route specific middleware!
+    next();
+  })
+  .options(function (req, res, next) {
+    res.sendStatus(200);
+  })
+  .post(function (req, res, next) {
+
+    var items = Object.values(req.body);
+    var layersPromises = [];
+    items[0].forEach(function (item) {
+      layersPromises.push(new Promise(function (resolve, reject) {
+
+        console.log(item);
+
+        let getParentPromise = new Promise(function (resolveParent, rejectParent) {
+          if (item.previousParentId == item.newParentId || item.newParentId == 0) {
+            if (item.newParentId == 0) {
+              item.newParent = null;
+            }
+            resolveParent();
+          }
+          else {
+            req.models.Group.get(item.newParentId, function (err, group) {
+              item.newParent = group;
+            });
+            resolveParent();
+          }
+        })  ;
+        let dbObject = null;
+        let getDbObjectPromise = new Promise(function (resolveDbObject, rejectDbObject) {
+          if (item.type == "Group") {
+            req.models.Group.get(item.itemId, function (err, group) {
+              dbObject = group;
+              resolveDbObject();
+            });
+          }
+          else if (item.type == "Layer") {
+            req.models.Layer.get(item.itemId, function (err, layer) {
+              dbObject = layer;
+              resolveDbObject();
+            });
+          }
+        });
+        Promise.all([getParentPromise, getDbObjectPromise]).then(function () {
+          updateGroupOrLayerSortOrderAndParentInDb(dbObject, item, resolve, reject);
+        });
+      }));
+    });
+    Promise.all(layersPromises).then(function () {
+      res.status(200).json("{}");
+    }).catch(function (error) {
+      console.log(error);
+      res.status(500).json(error.message);
+    });
+  });
+
+function updateGroupOrLayerSortOrderAndParentInDb(dbItem, item, resolve, reject) {
+  dbItem.order_number = item.newOrderNumber;
+  if (item.type == "Group") {
+    dbItem.parent = null;
+    if (item.newParent) {
+      dbItem.parent = item.newParent.name;
+    }
+  }
+  else if (item.type == "Layer") {
+    dbItem.group = null;
+    if (item.newParent) {
+      dbItem.group = item.newParent;
+    }
+  }
+  console.log("saving item with id " + item.itemId);
+  try {
+    dbItem.save(function (err) {
+      if (err) {
+        console.log(err);
+        return reject(err);
+      }
+    });
+    console.log("Save complete");
+    resolve();
+  }
+  catch (ex) {
+    consol.log(ex.message);
+  }
+}
+
 domainRouter.route('/fetchConfigStyles/:configId')
   .all(function (req, res, next) {
     // runs for all HTTP verbs first
@@ -444,6 +534,5 @@ domainRouter.route('/fetchConfigStyles/:configId')
       });
     });
   });
-
 module.exports = domainRouter;
 
