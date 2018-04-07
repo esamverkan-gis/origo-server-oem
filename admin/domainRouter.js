@@ -385,9 +385,6 @@ domainRouter.route('/updateSortOrderAndParentOfLayersAndGroups')
 
         let getParentPromise = new Promise(function (resolveParent, rejectParent) {
           if (item.previousParentId == item.newParentId || item.newParentId == 0) {
-            if (item.newParentId == 0) {
-              item.newParent = null;
-            }
             resolveParent();
           }
           else {
@@ -428,8 +425,10 @@ domainRouter.route('/updateSortOrderAndParentOfLayersAndGroups')
 function updateGroupOrLayerSortOrderAndParentInDb(dbItem, item, resolve, reject) {
   dbItem.order_number = item.newOrderNumber;
   if (item.type == "Group") {
-    dbItem.parent = null;
-    if (item.newParent) {
+    if (item.newParentId == 0) {
+      dbItem.parent = null;
+    }
+    else if (item.newParent) {
       dbItem.parent = item.newParent.name;
     }
   }
