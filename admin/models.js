@@ -75,7 +75,7 @@ module.exports = function (options) {
         visible: Boolean,
         type: String,
         attribution: String,
-        order_number: Number
+        order_number: Number,
       }, {
           methods: {
             createJsonObject: function () {
@@ -87,6 +87,7 @@ module.exports = function (options) {
               obj.queryable = this.queryable;
               obj.visible = this.visible;
               obj.type = this.type;
+              obj.group = this.group.name;
               if (this.attribution) obj.attribution = this.attribution;
               return obj;
             }
