@@ -1,7 +1,7 @@
 var orm = require('orm');
 origoConfig = require('../conf/config');
 
-module.exports = function(options) {
+module.exports = function (options) {
   // return function(req, res, next) {
   // Implement the middleware function based on the options object
   var connetionString = 'sqlite:' + origoConfig.adminDataBase.relativePath;
@@ -9,7 +9,7 @@ module.exports = function(options) {
   // return orm.express("sqlite://C:/Users/imta/Sundsvall/OrigoDataBase/OrigoDataBase.db", {
   return orm.express(connetionString, {
 
-    define: function(db, models, next) {
+    define: function (db, models, next) {
       var Group = db.define("groups", {
         name: String,
         title: String,
@@ -18,42 +18,53 @@ module.exports = function(options) {
         order_number: Number,
         config_id: Number
       }, {
-        methods: {
-          // This method is supposed to create the corrinsponding json object to be exported to index.json, that's why it does not handle config_id 
-          createJsonObject: function() {
-            let obj = {};
-            obj.name = this.name;
-            obj.title = this.title;
-            if (this.parent) obj.parent = this.parent;
-            obj.expanded = this.expanded;
-            obj.order_number = this.order_number;
-            return obj;
-          },
-          // this method finds a layer (just any layer) that belongs to this group, then returns its config_id.
-          // this way, we can simply get the config for each group's id! :)
-          // getConfig is adefaul function in orm, therefore added x!
-          getConfigx: function() { 
-            let that = this;
-            return new Promise(function(resolve, reject) {
-              Layer.find({ group_id: that.id }, function(err, layers) {
-                if (err) {
-                  reject();
-                  return;
+          methods: {
+            // This method is supposed to create the corrinsponding json object to be exported to index.json, that's why it does not handle config_id 
+            createJsonObject: function () {
+              let obj = {};
+              let format = "origo";
+              if (format == "origo") {
+                obj.name = this.name;
+                obj.title = this.title;
+                obj.expanded = this.expanded;
+                if(this.groups && this.groups.length > 0){
+                  obj.groups = this.groups;
                 }
-                if (layers.length == 0) {
-                  console.log('group ' + that.name + ' with id : ' + that.id + ' does not belong to any layer.');
-                  reject('group ' + that.name + ' with id : ' + that.id + ' does not belong to any layer.');
-                  return;
-                } else {
-                  console.log(`group "${that.name}" with id : ${that.id} belongs to config : ${layers[0].config_id}`);
-                  resolve(layers[0].config_id);
-                }
+              }
+              else {
+                obj.name = this.name;
+                obj.title = this.title;
+                if (this.parent) obj.parent = this.parent;
+                obj.expanded = this.expanded;
+                obj.order_number = this.order_number;
+              }
+              return obj;
+            },
+            // this method finds a layer (just any layer) that belongs to this group, then returns its config_id.
+            // this way, we can simply get the config for each group's id! :)
+            // getConfig is adefaul function in orm, therefore added x!
+            getConfigx: function () {
+              let that = this;
+              return new Promise(function (resolve, reject) {
+                Layer.find({ group_id: that.id }, function (err, layers) {
+                  if (err) {
+                    reject();
+                    return;
+                  }
+                  if (layers.length == 0) {
+                    console.log('group ' + that.name + ' with id : ' + that.id + ' does not belong to any layer.');
+                    reject('group ' + that.name + ' with id : ' + that.id + ' does not belong to any layer.');
+                    return;
+                  } else {
+                    console.log(`group "${that.name}" with id : ${that.id} belongs to config : ${layers[0].config_id}`);
+                    resolve(layers[0].config_id);
+                  }
+                });
               });
-            });
-          } 
-        },
-        validations: {}
-      });
+            }
+          },
+          validations: {}
+        });
 
       var Layer = db.define("layer", {
         name: String,
@@ -66,22 +77,22 @@ module.exports = function(options) {
         attribution: String,
         order_number: Number
       }, {
-        methods: {
-          createJsonObject: function() {
-            let obj = {};
-            obj.name = this.name;
-            if (this.name_id) obj.id = this.name_id;
-            obj.title = this.title;
-            obj.format = this.format;
-            obj.queryable = this.queryable;
-            obj.visible = this.visible;
-            obj.type = this.type;
-            if (this.attribution) obj.attribution = this.attribution;
-            return obj;
-          }
-        },
-        validations: {}
-      });
+          methods: {
+            createJsonObject: function () {
+              let obj = {};
+              obj.name = this.name;
+              if (this.name_id) obj.id = this.name_id;
+              obj.title = this.title;
+              obj.format = this.format;
+              obj.queryable = this.queryable;
+              obj.visible = this.visible;
+              obj.type = this.type;
+              if (this.attribution) obj.attribution = this.attribution;
+              return obj;
+            }
+          },
+          validations: {}
+        });
 
       var Source = db.define("source", {
         name: String,
@@ -89,17 +100,17 @@ module.exports = function(options) {
         version: String,
         service: String
       }, {
-        methods: {
-          createJsonObject: function() {
-            let obj = {};
-            obj.url = this.url;
-            obj.version = this.version;
-            obj.service = this.service;
-            return obj;
-          }
-        },
-        validations: {}
-      });
+          methods: {
+            createJsonObject: function () {
+              let obj = {};
+              obj.url = this.url;
+              obj.version = this.version;
+              obj.service = this.service;
+              return obj;
+            }
+          },
+          validations: {}
+        });
 
       var Attribute = db.define("attribute", {
         name: String,
@@ -108,9 +119,9 @@ module.exports = function(options) {
         url_title: String,
         html: String
       }, {
-        methods: {},
-        validations: {}
-      });
+          methods: {},
+          validations: {}
+        });
 
       var Config = db.define("config", {
         name: String,
@@ -122,24 +133,24 @@ module.exports = function(options) {
         resolutions: String,
         featureinfo_options: Object
       }, {
-        methods: {},
-        validations: {}
-      });
+          methods: {},
+          validations: {}
+        });
 
       var Control = db.define("control", {
         name: String,
         options: Object
       }, {
-        methods: {
-          createJsonObject: function() {
-            let obj = {};
-            obj.name = this.name;
-            if (this.options) obj.options = this.options;
-            return obj;
-          }
-        },
-        validations: {}
-      });
+          methods: {
+            createJsonObject: function () {
+              let obj = {};
+              obj.name = this.name;
+              if (this.options) obj.options = this.options;
+              return obj;
+            }
+          },
+          validations: {}
+        });
 
       /*var ControlOptions = db.define("controloptions", {
         content: String
@@ -153,9 +164,9 @@ module.exports = function(options) {
         alias: String,
         projection: String
       }, {
-        methods: {},
-        validations: {}
-      });
+          methods: {},
+          validations: {}
+        });
 
       var Style = db.define("style", {
         name: String,
@@ -169,47 +180,47 @@ module.exports = function(options) {
         image_source: String,
         legend_is_multirow: Boolean
       }, {
-        methods: {
-          createJsonObject: function() {
-            let obj = {};
-            let styleType = this.style_type;
-            if (styleType == 'stroke') {
-              obj.stroke = {};
-              obj.stroke.color = this.stroke_color;
-              obj.stroke.width = this.width
-              if (this.fill_color) {
-                obj.fill = {};                
-                obj.fill.color = this.fill_color;
+          methods: {
+            createJsonObject: function () {
+              let obj = {};
+              let styleType = this.style_type;
+              if (styleType == 'stroke') {
+                obj.stroke = {};
+                obj.stroke.color = this.stroke_color;
+                obj.stroke.width = this.width
+                if (this.fill_color) {
+                  obj.fill = {};
+                  obj.fill.color = this.fill_color;
+                }
               }
+              if (styleType == 'circle') {
+                obj.circle = {};
+                obj.circle.radius = this.radius;
+                obj.circle.stroke = {};
+                obj.circle.stroke.color = this.stroke_color;
+                obj.circle.stroke.width = this.width;
+                obj.circle.fill = {};
+                obj.circle.fill.color = this.fill_color;
+              }
+              if (styleType == 'icon') {
+                obj.icon = {};
+                obj.icon.src = this.icon_source;
+              }
+              if (styleType == 'image') {
+                obj.image = {};
+                obj.image.src = this.image_source;
+              }
+              if (this.legend_is_multirow) {
+                obj.legendIsMultiRow = this.legend_is_multirow;
+              }
+              if (this.sld_style) {
+                obj.sldStyle = this.sld_style;
+              }
+              return obj;
             }
-            if (styleType == 'circle') {
-              obj.circle = {};
-              obj.circle.radius = this.radius;
-              obj.circle.stroke = {};
-              obj.circle.stroke.color = this.stroke_color;
-              obj.circle.stroke.width = this.width;
-              obj.circle.fill = {};
-              obj.circle.fill.color = this.fill_color;
-            }
-            if (styleType == 'icon') {
-              obj.icon = {};
-              obj.icon.src = this.icon_source;
-            }
-            if (styleType == 'image') {
-              obj.image = {};
-              obj.image.src = this.image_source;
-            }
-            if (this.legend_is_multirow) {
-              obj.legendIsMultiRow = this.legend_is_multirow;
-            }
-            if (this.sld_style) {
-              obj.sldStyle = this.sld_style;
-            }
-            return obj;
-          }
-        },
-        validations: {}
-      });
+          },
+          validations: {}
+        });
 
       Config.hasOne('proj4Defs', Proj4Defs);
       Control.hasOne('config', Config);
