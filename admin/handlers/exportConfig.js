@@ -22,13 +22,24 @@ var exportConfig = function (req, res) {
 
   // var configName = req.params["configName"];
   var configId = req.params["configId"];
-  // var configId;
-  var index = {};
-  // var groupsMap = new Map();
-  var groups = [];
-  index.source = {};
+  var index = {
+    configName : null,
+    projectionExtent : null,
+    extent : null,
+    center : null,
+    resolutions : null,
+    zoom : null,
+    featureInfoOptions : null,
+    projectionCode : null,
+    proj4Defs : [],
+    controls : [],
+    layers : [],
+    groups : [],
+    source : {},
+    styles : {}
+  }
+  
   var sourcesMap = new Map();
-  index.styles = {};
   var stylesMap = new Map();
 
   var configPromise = new Promise(function (resolve, reject) {
@@ -63,7 +74,7 @@ var exportConfig = function (req, res) {
       });
     });
   });
-  index.controls = [];
+  
   //configPromise.then(function () {
   // it is also possible to use config.getControls() method if we say Control.hasOne('config', Config, {reverse: 'control'}).
   let controlsPromise = new Promise(function (resolve, reject) {
@@ -100,8 +111,7 @@ var exportConfig = function (req, res) {
       resolve();
     })
   });
-  index.layers = [];
-  index.groups = [];
+ 
   Promise.all([configPromise, controlsPromise, groupsPromise, layersPromise]).then(function () {
     let groupLayerTree = GroupLayerTreeUtil.reconstructGroupLayerTree(dbGroups, dbLayers);
     console.log(groupLayerTree);
