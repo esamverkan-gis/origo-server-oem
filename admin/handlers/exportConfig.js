@@ -123,9 +123,10 @@ var exportConfig = function (req, res) {
     let layersPromises = [];
 
     result.layers.forEach(function (layer) {
-      layersPromises.push(new Promise(function (layerResolve, layerReject) {
-        let layerJsonObj = layer.createJsonObject();
+      let layerJsonObj = layer.createJsonObject();
+      index.layers.push(layerJsonObj);  //important to place this in the list of layers before using promise to populate
 
+      layersPromises.push(new Promise(function (layerResolve, layerReject) {
         let sourcePromise = function () {
           return new Promise(function (resolve, reject) {
             layer.getSource(function (err, source) {
@@ -180,7 +181,7 @@ var exportConfig = function (req, res) {
         }
         Promise.all([sourcePromise(), stylePromise(), attributePromise()]).
           then(function () {
-            index.layers.push(layerJsonObj);
+
             layerResolve();
             //resolve();
           })
