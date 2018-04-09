@@ -1,4 +1,5 @@
 // This module reads the config (index.json) from request's body and writes the whole config to the database.
+var configBc = require('../bc/ConfigBc');
 
 "use strict";
 
@@ -33,7 +34,7 @@ var importConfig = function (req, res) {
   }
 };
 
-function importJsonData (req, res) {
+function importJsonData(req, res) {
   // return new Promise(function(resolve, reject) {
 
   var Group = req.models.Group;
@@ -441,12 +442,13 @@ function importJsonData (req, res) {
     res.status(200).send({});
   }).catch(function (error) {
     console.log(error);
+    // catch(console.log.bind(console)); // <-- this is badass
+    
+    // the already saved config and its groups should be removed from the data base otherwise they will apear in the config list with next page refresh!
+    if (config.id) configBc.removeConfigGraph(req, res, config.id);
+
     // exceptionMessage is used in order to signal adminapi that there is an error, see method of basePostFormAsMultiData in adminapi.
     res.status(400).json({ exceptionMessage: error.message });
-    // catch(console.log.bind(console)); // <-- this is badass
-
-    // TODO: domainRouter.route('/removeConfigGraph/:configId')
-    // the already saved config and its groups should be removed from the data base otherwise they will apear in the config list with next page refresh!
   });
 }
 
