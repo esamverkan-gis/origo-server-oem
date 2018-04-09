@@ -17,6 +17,10 @@ var importConfig = function (req, res) {
     console.log("Importerar från req.files");
     //TODO: SANITYCHECK
     let file1 = req.files.file1;
+    if (!file1) {
+      res.status(400).json({ exceptionMessage: 'Någonting gick fel! se till att du har valt en fil.' });
+      return;
+    }
     if (file1.data) {
       try {
         req.body = JSON.parse(file1.data);
