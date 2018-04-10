@@ -395,7 +395,7 @@ function updateGroupOrLayerSortOrderAndParentInDb(dbItem, item, resolve, reject)
       dbItem.group = item.newParent;
     }
   }
-  console.log("saving item with id " + item.itemId);
+  //console.log("saving item with id " + item.itemId);
   try {
     dbItem.save(function (err) {
       if (err) {
@@ -403,7 +403,7 @@ function updateGroupOrLayerSortOrderAndParentInDb(dbItem, item, resolve, reject)
         return reject(err);
       }
     });
-    console.log("Save complete");
+    //console.log("Save complete");
     resolve();
   }
   catch (ex) {
