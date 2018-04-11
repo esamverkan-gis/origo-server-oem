@@ -338,7 +338,7 @@ domainRouter.route('/updateSortOrderAndParentOfLayersAndGroups')
     items[0].forEach(function (item) {
       layersPromises.push(new Promise(function (resolve, reject) {
 
-        console.log(item);
+       //console.log(item);
 
         let getParentPromise = new Promise(function (resolveParent, rejectParent) {
           if (item.previousParentId == item.newParentId || item.newParentId == 0) {

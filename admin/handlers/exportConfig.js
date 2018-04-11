@@ -114,7 +114,7 @@ var exportConfig = function (req, res) {
  
   Promise.all([configPromise, controlsPromise, groupsPromise, layersPromise]).then(function () {
     let groupLayerTree = GroupLayerTreeUtil.reconstructGroupLayerTree(dbGroups, dbLayers);
-    console.log(groupLayerTree);
+    //console.log(groupLayerTree);
     let result = GroupLayerTreeUtil.splitLayerGroupTreeIntoOrderedLists(groupLayerTree, { groups: [], layers: [], addedGroups: [] });
     
     result.groups.forEach(function (group) {
@@ -405,7 +405,7 @@ var exportConfigOld = function (req, res) {
 
         } else if (exportStyle === 'origo') {
 
-          console.log(groups);
+          // console.log(groups);
           let findParent = function (group, groups) {
             let res = null;
             let ll = groups.length;
