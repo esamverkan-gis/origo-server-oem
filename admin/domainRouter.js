@@ -384,16 +384,16 @@ domainRouter.route('/updateSortOrderAndParentOfLayersAndGroups')
         console.log(item);
 
         let getParentPromise = new Promise(function (resolveParent, rejectParent) {
-          if (item.previousParentId == item.newParentId || item.newParentId == 0) {
+          if (item.previousParentId == item.newParentId || item.newParentId == 0 || item.newParentId == null) {
             resolveParent();
           }
           else {
             req.models.Group.get(item.newParentId, function (err, group) {
               item.newParent = group;
+              resolveParent();
             });
-            resolveParent();
           }
-        })  ;
+        });
         let dbObject = null;
         let getDbObjectPromise = new Promise(function (resolveDbObject, rejectDbObject) {
           if (item.type == "Group") {
@@ -441,16 +441,18 @@ function updateGroupOrLayerSortOrderAndParentInDb(dbItem, item, resolve, reject)
   console.log("saving item with id " + item.itemId);
   try {
     dbItem.save(function (err) {
+      console.log("Save complete");
+      resolve();
       if (err) {
         console.log(err);
         return reject(err);
       }
     });
-    console.log("Save complete");
-    resolve();
+    
   }
   catch (ex) {
     consol.log(ex.message);
+    return reject(err);
   }
 }
 

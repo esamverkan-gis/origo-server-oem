@@ -1,6 +1,6 @@
 "use strict";
 const reconstructGroupLayerTree = (groups, layers) => {
-    let treeRoot = {groupId: 0, name: 'ROOT', children:[], object: {}};   
+    let treeRoot = {groupId: 0, title: "", name: 'ROOT', children:[], object: {}};   
     treeRoot = addGroupsAndLayersToGroup(treeRoot, groups, layers);
     return treeRoot;
 }
@@ -21,7 +21,7 @@ const addGroupsAndLayersToGroup = (currentTreeNode, groups, layers) => {
             else{
                 layers.forEach(function(layer){
                     if(layer.group_id == currentTreeNode.groupId){
-                        let newLayerNode = {layerId: layer.id, name: layer.title, object:layer, parentId: layer.group_id, leaf:true, order_number: layer.order_number};   
+                        let newLayerNode = {layerId: layer.id, name: layer.name, title:layer.title, object:layer, parentId: layer.group_id, leaf:true, order_number: layer.order_number};   
                         currentTreeNode.children.push(newLayerNode);
                         remove(layers, layer);
                     }
