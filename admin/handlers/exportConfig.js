@@ -54,7 +54,7 @@ var exportConfig = function (req, res) {
       } else {
         var config = rows[0];
       }
-      configId = config.id;
+      // configId = config.id;
       index.configName = config.name;
       // index.projectionCode = config.projection_code;
       index.projectionExtent = config.projection_extent.split(',').map(Number);
@@ -95,7 +95,7 @@ var exportConfig = function (req, res) {
     });
   });
 
-  var configId = req.params["configId"];
+  //var configId = req.params["configId"];
   let dbGroups = [];
   let dbLayers = [];
   let groupsPromise = new Promise(function (resolve, reject) {

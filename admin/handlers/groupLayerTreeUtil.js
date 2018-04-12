@@ -12,7 +12,7 @@ const addGroupsAndLayersToGroup = (currentTreeNode, groups, layers) => {
         }
         else{
             if((group.parent == null && currentTreeNode.name == "ROOT") || (group.parent == currentTreeNode.name)){
-                let newGroupNode = {groupId: group.id, name: group.name, object: group, parent:group.parent, parentId: group.parent, children:[],order_number: group.order_number};   
+                let newGroupNode = {groupId: group.id, name: group.name, title: group.title, object: group, parent:group.parent, parentId: group.parent, children:[],order_number: group.order_number};   
                 if(groups.length > 0 ||layers.length > 0){
                     newGroupNode = addGroupsAndLayersToGroup(newGroupNode, groups, layers);         
                 }
