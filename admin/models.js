@@ -13,9 +13,10 @@ module.exports = function (options) {
       var Group = db.define("groups", {
         name: String,
         title: String,
-        parent: Number,
+        parent: String,
         expanded: Boolean,
         order_number: Number,
+        parent_id: Number,
         config_id: Number
       }, {
           methods: {
