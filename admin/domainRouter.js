@@ -390,7 +390,9 @@ function updateGroupOrLayerSortOrderAndParentInDb(dbItem, item, resolve, reject)
     }
   }
   else if (item.type == "Layer") {
-    dbItem.group = null;
+    if (item.newParentId == 0) {
+      dbItem.parent = null;
+    }
     if (item.newParent) {
       dbItem.group = item.newParent;
     }
