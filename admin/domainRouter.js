@@ -333,9 +333,9 @@ domainRouter.route('/updateSortOrderAndParentOfLayersAndGroups')
   })
   .post(function (req, res, next) {
 
-    var items = Object.values(req.body);
+    var items = req.body.itemsToUpdate;
     var layersPromises = [];
-    items[0].forEach(function (item) {
+    items.forEach(function (item) {
       layersPromises.push(new Promise(function (resolve, reject) {
 
        //console.log(item);
@@ -390,7 +390,9 @@ function updateGroupOrLayerSortOrderAndParentInDb(dbItem, item, resolve, reject)
     }
   }
   else if (item.type == "Layer") {
-    dbItem.group = null;
+    if (item.newParentId == 0) {
+      dbItem.parent = null;
+    }
     if (item.newParent) {
       dbItem.group = item.newParent;
     }
