@@ -28,6 +28,7 @@ module.exports = function (options) {
                 obj.name = this.name;
                 obj.title = this.title;
                 obj.expanded = this.expanded;
+                //obj.parent = this.parent;
                 if(this.groups && this.groups.length > 0){
                   obj.groups = this.groups;
                 }

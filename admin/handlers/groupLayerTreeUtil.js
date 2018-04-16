@@ -50,14 +50,16 @@ function splitLayerGroupTreeIntoOrderedLists(currentNode, result){
         currentNode.object.groups = [];
         currentNode.children.sort(sortGroupOrLayerFunction).forEach(function(item){
             if(item.groupId){
-                currentNode.object.groups.push(item.object.createJsonObject());
                 result.addedGroups.push(item); //mark as added so we dont get dupplicates
+                let resultSubCall = splitLayerGroupTreeIntoOrderedLists(item, result);
+                result.layers.concat(resultSubCall.layers);
+                result.groups.concat(resultSubCall.groups);
+                currentNode.object.groups.push(item.object.createJsonObject());
             }
             else{
                 item.object.group = currentNode.object;
                 result.layers.push(item.object);
             }
-            result = splitLayerGroupTreeIntoOrderedLists(item, result);
         });
     }
     if(currentNode.groupId && currentNode.parent == null){
