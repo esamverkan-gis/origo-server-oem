@@ -148,7 +148,14 @@ module.exports = function (options) {
             createJsonObject: function () {
               let obj = {};
               obj.name = this.name;
-              if (this.options) obj.options = this.options;
+              if (this.options) {
+                obj.options = this.options;
+                // this line is for "measure" control's measureTools option that should be a list but sqlite
+                // saves it as a comma seperated string.
+                if (this.name === 'measure' && 
+                    this.options.measureTools && 
+                    this.options.measureTools.constructor === 'String') obj.options.measureTools = this.options.measureTools.split(',');
+              }
               return obj;
             }
           },

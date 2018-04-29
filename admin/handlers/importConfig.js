@@ -138,6 +138,9 @@ function importJsonData(req, res) {
     });
   };
 
+  
+    
+
   let saveConfig = function () {
     return new Promise(function (resolve, reject) {
       // saving the config using proj4defs from previous promise, is resolved, return config object
@@ -193,18 +196,18 @@ function importJsonData(req, res) {
   let saveAllGroups = function () {
     return new Promise(function (resolve, reject) {
       // try saving all groups and if resolved return a Map with id, name of the groups
-      var groupOrderNumber = 1;
       var data = [];
-
-      // WARNING: this functions handles both styles of groups structure, but the file being imported should not be mixed. 
+      
+      // WARNING: this functions handles both import styles for groups structure, Notice that the file being imported should not be mixed. 
       let f = function (groups, parent) {
+        var groupOrderNumber = 1;
         console.log(groups);
         for (let group of groups) {
           group.order_number = groupOrderNumber++;
           data.push({
             name: group.name,
             title: group.title,
-            parent: parent || group.parent,
+            parent: parent || group.parent, // origo or decerno syntax
             expanded: group.expanded,
             order_number: group.order_number,
             // this line was added later and is not part of the original db design
@@ -311,19 +314,30 @@ function importJsonData(req, res) {
     });
   };
 
+  let layersOrderNumber = {};
   let saveAllLayers = function () {
     return new Promise(function (resolve, reject) {
       // saving all layers using config and groups
-      // var layerOrderNumber = 1;
       var data = [];
-      var currentgroup = "";
-      var groupCounter = 1;
-      for (let layer of layers) { // TODO: sort by group.name and then alphabeticaly layer.title
+      for (let layer of layers) {
         let group = savedGroups.get(layer.group);
         if (!group) {
           console.log('layer ' + layer.name + ' has no group or group deos not exist in groups!');
           reject(Error('layer ' + layer.name + ' has no group or group deos not exist in groups!'));
           return;
+        } else {
+          if (!layersOrderNumber[layer.group]) { // means that it is the first layer that belongs this group.
+
+            // every group that has this group as its parent is a child
+            let sg = Array.from(savedGroups.values());
+            let childGroups = sg.filter(g => {
+              return (g.parent === layer.group);
+            });
+
+            layersOrderNumber[layer.group] = {
+              orderNumber : childGroups.length // we need to start layer numbers after the number of subgroups
+            };
+          }
         }
         let source = savedSources.get(layer.source);
         if (!source) {
@@ -337,12 +351,8 @@ function importJsonData(req, res) {
           reject(Error('layer ' + layer.name + ' has no style or style deos not exist in styles!'));
           return;
         }
-        if (group.name != currentgroup.name) {
-          groupCounter = 1;
-          currentgroup = group;
-        }
-        layer.order_number = groupCounter++;
-        //layer.order_number = layerOrderNumber++;
+
+        layersOrderNumber[layer.group].orderNumber++;
         data.push({
           name: layer.name,
           name_id: layer.id,
@@ -352,7 +362,7 @@ function importJsonData(req, res) {
           visible: layer.visible,
           type: layer.type,
           attribution: layer.attribution,
-          order_number: layer.order_number,
+          order_number: layersOrderNumber[layer.group].orderNumber,
           config_id: config.id,
           group_id: group.id,
           source_id: source.id,
