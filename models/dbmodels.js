@@ -1,6 +1,6 @@
 var dbModels = {};
 
-dbModels.oracle = require('./oracledefault');
+//dbModels.oracle = require('./oracledefault');
 dbModels.mssql = require('./mssqldefault');
 dbModels.pg = require('./pgdefault');
 

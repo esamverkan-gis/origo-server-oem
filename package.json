@@ -17,6 +17,7 @@
     "express": "~4.9.0",
     "express-fileupload": "^0.2.0",
     "express-handlebars": "^3.0.0",
+    "npm": "^6.0.0",
     "orm": "~4.0.2",
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
