@@ -22,6 +22,7 @@ var controlRouter = require('../admin/controlRouter.js');
 var attributeRouter = require('../admin/attributeRouter.js');
 var domainRouter = require('../admin/domainRouter.js');
 var proj4defsRouter = require('../admin/proj4defsRouter');
+var searchRouter = require('../admin/searchRouter');
 
 // loading models for orm, options are arbitrary
 adminRouter.use(models({ /*option1: '1', option2: '2' */ }));
@@ -61,6 +62,7 @@ adminRouter.use('/control', controlRouter);
 adminRouter.use('/attribute', attributeRouter);
 adminRouter.use('/proj4defs', proj4defsRouter);
 adminRouter.use('/domain', domainRouter);
+adminRouter.use('/search', searchRouter);
 
 //*********************************************************************ExportConfig**********************************************************************
 // read data from database and create index.json 
