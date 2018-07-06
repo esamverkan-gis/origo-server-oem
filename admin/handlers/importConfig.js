@@ -93,9 +93,17 @@ function importJsonData(req, res) {
   var savedStyles = new Map();
   var savedLayers = new Map();
 
-  // this small peice of code should run only first time to create the database and its tables.
+  // this small peice of code need to run only first time to create the database and its tables.
   // after that it connects to an existing database.
-
+  // Important: starting server for the first time without a databse file, will create a database automatically, because in admin.js
+  // models are required and in models.js connection string is defined and connection to db is created. BUT it does not create any table in 
+  // the database. Therefore we need to run this sync method. this was a source of confusion for a long time!
+  // This also means that OrigoAdmin cannot create a config for the firt time, it MUST import a config so that this sync function is run
+  // and tables are created.
+  // Important: if tables are already created, this sync function has no effect. This means that adding new fields to the model and running 
+  // sync function (via importing a new config) does NOT create new columns in the db. In this case we need to add new fields to model, and add new 
+  // columns to tables by scripting db. (do not forget to write changes to db after executing sql if you use "DB Browser for SQLite")
+  
   // Problem: db object is not available !
   let syncDatabase = function () {
     return new Promise(function (resolve, reject) {
@@ -436,8 +444,10 @@ function importJsonData(req, res) {
   };
 
   syncDatabase().then(function () {
-    return saveProj4defs();
-  }).then(function () {
+   return saveProj4defs();
+  })
+  // saveProj4defs()
+  .then(function () {
     return saveConfig();
   }).then(function () {
     return saveAllGroups();

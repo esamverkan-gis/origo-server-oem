@@ -1,6 +1,10 @@
 var orm = require('orm');
 origoConfig = require('../conf/config');
 
+// Ipmortant: Defining extra columns in db without defining then in the model does not do any harm, those columns are simply ignored.
+// BUT adding changing the model without chnging db will crash the server. Sync function cannot apply changes to an already existing db.
+// those changes should be scripted and applied to db directly.
+
 module.exports = function (options) {
   // return function(req, res, next) {
   // Implement the middleware function based on the options object
@@ -17,7 +21,8 @@ module.exports = function (options) {
         expanded: Boolean,
         order_number: Number,
         parent_id: Number,
-        config_id: Number
+        config_id: Number,
+        collapsed_in_admin_tree: Boolean
       }, {
           methods: {
             // This method is supposed to create the corrinsponding json object to be exported to index.json, that's why it does not handle config_id 
@@ -78,6 +83,7 @@ module.exports = function (options) {
         type: String,
         attribution: String,
         order_number: Number,
+        collapsed_in_admin_tree: Boolean
       }, {
           methods: {
             createJsonObject: function () {
