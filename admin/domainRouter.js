@@ -428,23 +428,23 @@ domainRouter.route('/fetchConfigStyles/:configId')
 
     var Layer = req.models.Layer;
     var Config = req.models.Config;
-    var Style = req.models.Style;
+    // var Style = req.models.Style;
     var configId = req.params["configId"];
     var styles = [];
 
-    var configPromise = new Promise(function (resolve, reject) {
-      Config.find({ id: configId }, function (err, rows) {
-        if (rows.length == 0) {
-          res.end('No config for this id was found.');
-          return;
-        } else {
-          var config = rows[0];
-        }
-        resolve();
-      });
-    });
+    // var configPromise = new Promise(function (resolve, reject) {
+    //   Config.find({ id: configId }, function (err, rows) {
+    //     if (rows.length == 0) {
+    //       res.end('No config for this id was found.');
+    //       return;
+    //     } else {
+    //       var config = rows[0];
+    //     }
+    //     resolve();
+    //   });
+    // });
 
-    configPromise.then(function () {
+    // configPromise.then(function () {
 
       let layersPromise = new Promise(function (resolve, reject) {
         Layer.find({ config_id: configId }, function (err, layers) {
@@ -492,7 +492,7 @@ domainRouter.route('/fetchConfigStyles/:configId')
         // if we do not send status 200, it won't be downloaded and a backup.json file will be downloaded in the OrigoAdmin
         res.status(200).json(error.message);
       });
-    });
+    // });
   });
 module.exports = domainRouter;
 
