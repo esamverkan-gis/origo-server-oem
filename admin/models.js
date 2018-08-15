@@ -82,8 +82,7 @@ module.exports = function (options) {
         visible: Boolean,
         type: String,
         attribution: String,
-        order_number: Number,
-        collapsed_in_admin_tree: Boolean
+        order_number: Number
       }, {
           methods: {
             createJsonObject: function () {
