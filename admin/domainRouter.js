@@ -388,6 +388,7 @@ function updateGroupOrLayerSortOrderAndParentInDb(dbItem, item, resolve, reject)
     else if (item.newParent) {
       dbItem.parent = item.newParent.name;
     }
+    dbItem.collapsed_in_admin_tree = item.collapsed_in_admin_tree;
   }
   else if (item.type == "Layer") {
     if (item.newParentId == 0) {
