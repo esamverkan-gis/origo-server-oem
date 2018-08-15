@@ -322,7 +322,7 @@ domainRouter.route('/fetchAttributeFromServer')
       });
   });
 
-domainRouter.route('/updateSortOrderAndParentOfLayersAndGroups')
+domainRouter.route('/updateGroupAndLayerTreeInformation')
   .all(function (req, res, next) {
     // runs for all HTTP verbs first
     // think of it as route specific middleware!
@@ -367,7 +367,7 @@ domainRouter.route('/updateSortOrderAndParentOfLayersAndGroups')
           }
         });
         Promise.all([getParentPromise, getDbObjectPromise]).then(function () {
-          updateGroupOrLayerSortOrderAndParentInDb(dbObject, item, resolve, reject);
+          updateGroupAndLayerTreeInformationInDb(dbObject, item, resolve, reject);
         });
       }));
     });
@@ -379,7 +379,7 @@ domainRouter.route('/updateSortOrderAndParentOfLayersAndGroups')
     });
   });
 
-function updateGroupOrLayerSortOrderAndParentInDb(dbItem, item, resolve, reject) {
+function updateGroupAndLayerTreeInformationInDb(dbItem, item, resolve, reject) {
   dbItem.order_number = item.newOrderNumber;
   if (item.type == "Group") {
     if (item.newParentId == 0) {
