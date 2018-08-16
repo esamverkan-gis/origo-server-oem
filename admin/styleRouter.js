@@ -79,13 +79,19 @@ styleRouter.route('/:id')
     });
   })
   .put(function (req, res, next) {
-    let newstyle = req.body;
+    const newStyle = req.body;
     req.models.Style.get(req.params.id, function (err, style) {
       if (!style) {
         res.sendStatus(404);
       } else {
-        Object.assign(style, newstyle);
-        style.save(function (err, style) {
+        
+        for (let key in style) {
+          if (style.hasOwnProperty(key)) {
+            style[key] = newStyle[key];
+          }
+        }
+
+        style.save(function (err) {
           if (err) res.sendStatus(500);
           else res.status(200).json(style);
         });
