@@ -63,6 +63,13 @@ var exportConfig = function (req, res) {
       index.resolutions = config.resolutions.split(',').map(Number);
       index.zoom = config.zoom;
       index.featureinfoOptions = config.featureinfo_options;
+      // En bugg i react gjorde att boolean values från en select box blir sträng.
+      // värde för pinning till vissa konfiger är boolean i db och till vissa är det sträng.
+      // detta för att säkerställa att i exporterade konfig står alltid boolean values
+      if (index.featureinfoOptions.pinning) {
+        if (index.featureinfoOptions.pinning === "false") index.featureinfoOptions.pinning = false;
+        if (index.featureinfoOptions.pinning === "true") index.featureinfoOptions.pinning = true;
+      }
       config.getProj4Defs(function (err, proj4Defs) {
         index.projectionCode = proj4Defs.code;
         index.proj4Defs = [{
