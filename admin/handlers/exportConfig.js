@@ -29,7 +29,7 @@ var exportConfig = function (req, res) {
     center : null,
     resolutions : null,
     zoom : null,
-    featureInfoOptions : null,
+    featureinfoOptions : null,
     projectionCode : null,
     proj4Defs : [],
     controls : [],
@@ -62,7 +62,7 @@ var exportConfig = function (req, res) {
       index.center = config.center.split(',').map(Number);
       index.resolutions = config.resolutions.split(',').map(Number);
       index.zoom = config.zoom;
-      index.featureInfoOptions = config.featureinfo_options;
+      index.featureinfoOptions = config.featureinfo_options;
       config.getProj4Defs(function (err, proj4Defs) {
         index.projectionCode = proj4Defs.code;
         index.proj4Defs = [{
@@ -329,7 +329,7 @@ var exportConfigOld = function (req, res) {
       index.center = config.center.split(',').map(Number);
       index.resolutions = config.resolutions.split(',').map(Number);
       index.zoom = config.zoom;
-      index.featureInfoOptions = config.featureinfo_options;
+      index.featureinfoOptions = config.featureinfo_options;
       config.getProj4Defs(function (err, proj4Defs) {
         index.projectionCode = proj4Defs.code;
         index.proj4Defs = [{
