@@ -93,7 +93,7 @@ function importJsonData(req, res) {
   var savedStyles = new Map();
   var savedLayers = new Map();
 
-  // this small peice of code need to run only first time to create the database and its tables.
+  // this small peice of code needs to br run only first time to create the database and its tables.
   // after that it connects to an existing database.
   // Important: starting server for the first time without a databse file, will create a database automatically, because in admin.js
   // models are required and in models.js connection string is defined and connection to db is created. BUT it does not create any table in 
@@ -145,9 +145,6 @@ function importJsonData(req, res) {
       resolve();
     });
   };
-
-  
-    
 
   let saveConfig = function () {
     return new Promise(function (resolve, reject) {
@@ -208,7 +205,7 @@ function importJsonData(req, res) {
       
       // WARNING: this functions handles both import styles for groups structure, Notice that the file being imported should not be mixed. 
       let f = function (groups, parent) {
-        var groupOrderNumber = 1;
+        var groupOrderNumber = 0;
         console.log(groups);
         for (let group of groups) {
           group.order_number = groupOrderNumber++;
@@ -468,7 +465,7 @@ function importJsonData(req, res) {
     console.log(error);
     // catch(console.log.bind(console)); // <-- this is badass
     
-    // the already saved config and its groups should be removed from the data base otherwise they will apear in the config list with next page refresh!
+    // the already saved config and its groups should be removed from the data base otherwise they will appear in the config list with next page refresh!
     if (config.id) configBc.removeConfigGraph(req, res, config.id);
 
     // exceptionMessage is used in order to signal adminapi that there is an error, see method of basePostFormAsMultiData in adminapi.

@@ -1,8 +1,8 @@
 var orm = require('orm');
 origoConfig = require('../conf/config');
 
-// Ipmortant: Defining extra columns in db without defining then in the model does not do any harm, those columns are simply ignored.
-// BUT adding changing the model without chnging db will crash the server. Sync function cannot apply changes to an already existing db.
+// Ipmortant: Defining extra columns in db without defining them in the model does not do any harm, those columns are simply ignored.
+// BUT adding or changing the model without changing db will crash the server. Sync function cannot apply changes to an already existing db.
 // those changes should be scripted and applied to db directly.
 
 module.exports = function (options) {
@@ -10,7 +10,7 @@ module.exports = function (options) {
   // Implement the middleware function based on the options object
   var connetionString = 'sqlite:' + origoConfig.adminDataBase.relativePath;
 
-  // return orm.express("sqlite://C:/Users/imta/Sundsvall/OrigoDataBase/OrigoDataBase.db", {
+  // return orm.express("sqlite://C:/Users/imta/OpenEmap/OrigoDataBase/OrigoDataBase.db", {
   return orm.express(connetionString, {
 
     define: function (db, models, next) {
@@ -34,7 +34,7 @@ module.exports = function (options) {
                 obj.title = this.title;
                 obj.expanded = this.expanded;
                 //obj.parent = this.parent;
-                if(this.groups && this.groups.length > 0){
+                if (this.groups && this.groups.length > 0) {
                   obj.groups = this.groups;
                 }
               }
@@ -157,9 +157,9 @@ module.exports = function (options) {
                 obj.options = this.options;
                 // this line is for "measure" control's measureTools option that should be a list but sqlite
                 // saves it as a comma seperated string.
-                if (this.name === 'measure' && 
-                    this.options.measureTools && 
-                    this.options.measureTools.constructor === 'String') obj.options.measureTools = this.options.measureTools.split(',');
+                if (this.name === 'measure' &&
+                  this.options.measureTools &&
+                  this.options.measureTools.constructor === 'String') obj.options.measureTools = this.options.measureTools.split(',');
               }
               return obj;
             }

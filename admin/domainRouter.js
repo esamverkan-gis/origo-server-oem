@@ -8,6 +8,7 @@ var helperFunctions = require('./handlers/helperFunctions');
 var xml2js = require('xml2js');
 var formatter = require('./handlers/formatter');
 var configBc = require('./bc/ConfigBc');
+var updateTreeStructure = require('./handlers/treeStructureHelpers');
 
 // req.models is a reference to models that ar defined in models.js and used as a middleware in admin.js
 
@@ -238,7 +239,7 @@ domainRouter.route('/removeConfigGraph/:configId')
   .options(function (req, res, next) {
     res.sendStatus(200);
   })
-  .delete(function(req, res, next) {
+  .delete(function (req, res, next) {
     const configId = req.params.configId;
     configBc.removeConfigGraph(req, res, configId);
     res.status(200).json({});
@@ -322,6 +323,39 @@ domainRouter.route('/fetchAttributeFromServer')
       });
   });
 
+domainRouter.route('/updateTreeStructure')
+  .all(function (req, res, next) {
+    // runs for all HTTP verbs first
+    // think of it as route specific middleware!
+    next();
+  })
+  .options(function (req, res, next) {
+    res.sendStatus(200);
+  })
+  .post(function (req, res, next) {
+    updateTreeStructure(req, res);
+    res.status(200).send({});
+  });
+
+domainRouter.route('/saveVisibilityStatus')
+  .all(function (req, res, next) {
+    // runs for all HTTP verbs first
+    // think of it as route specific middleware!
+    next();
+  })
+  .options(function (req, res, next) {
+    res.sendStatus(200);
+  })
+  .post(function (req, res, next) {
+    const data = JSON.parse(req.body.data);
+    req.models.Group.find({ id: data.group_id, config_id: data.config_id }).each(function (group) {
+      group.collapsed_in_admin_tree = data.expanded;
+    }).save(function (err) {
+      if (err) console.log(err.message);
+    });
+    res.status(200).send({});
+  });
+
 domainRouter.route('/updateGroupAndLayerTreeInformation')
   .all(function (req, res, next) {
     // runs for all HTTP verbs first
@@ -338,7 +372,7 @@ domainRouter.route('/updateGroupAndLayerTreeInformation')
     items.forEach(function (item) {
       layersPromises.push(new Promise(function (resolve, reject) {
 
-       //console.log(item);
+        //console.log(item);
 
         let getParentPromise = new Promise(function (resolveParent, rejectParent) {
           if (item.previousParentId == item.newParentId || item.newParentId == 0 || item.newParentId == null) {
@@ -408,7 +442,7 @@ function updateGroupAndLayerTreeInformationInDb(dbItem, item, resolve, reject) {
         return reject(err);
       }
     });
-    
+
   }
   catch (ex) {
     consol.log(ex.message);
@@ -447,52 +481,52 @@ domainRouter.route('/fetchConfigStyles/:configId')
 
     // configPromise.then(function () {
 
-      let layersPromise = new Promise(function (resolve, reject) {
-        Layer.find({ config_id: configId }, function (err, layers) {
-          var layersPromises = [];
-          for (let layer of layers) {
-            layersPromises.push(new Promise(function (resolve, reject) {
-              let obj = {};
-              let stylePromise = function () {
-                return new Promise(function (resolve, reject) {
-                  layer.getStyle(function (err, style) {
-                    // if (!style) reject(new Error('layer "' + layer.name + '" has no style.'));
-                    if (style) {
-                      obj.name = style.name;
-                      obj.id = style.id;
-                    }
-                    resolve();
-                  });
-                });
-              }
-              stylePromise()
-                .then(function () {
-                  styles.push(obj);
+    let layersPromise = new Promise(function (resolve, reject) {
+      Layer.find({ config_id: configId }, function (err, layers) {
+        var layersPromises = [];
+        for (let layer of layers) {
+          layersPromises.push(new Promise(function (resolve, reject) {
+            let obj = {};
+            let stylePromise = function () {
+              return new Promise(function (resolve, reject) {
+                layer.getStyle(function (err, style) {
+                  // if (!style) reject(new Error('layer "' + layer.name + '" has no style.'));
+                  if (style) {
+                    obj.name = style.name;
+                    obj.id = style.id;
+                  }
                   resolve();
-                })
-                .catch(function (err) {
-                  reject(err);
                 });
-            }));
-          }
-          Promise.all(layersPromises).then(function () {
-            resolve();
-          }).catch(function (err) {
-            reject(err);
-          });
+              });
+            }
+            stylePromise()
+              .then(function () {
+                styles.push(obj);
+                resolve();
+              })
+              .catch(function (err) {
+                reject(err);
+              });
+          }));
+        }
+        Promise.all(layersPromises).then(function () {
+          resolve();
+        }).catch(function (err) {
+          reject(err);
         });
       });
+    });
 
-      layersPromise.then(function () {
-        console.log('done!');
-        res.setHeader('Content-disposition', 'attachment; filename=index.json');
-        res.setHeader('Content-type', 'application/json');
-        res.status(200).json(styles);
-      }).catch(function (error) {
-        console.log(error);
-        // if we do not send status 200, it won't be downloaded and a backup.json file will be downloaded in the OrigoAdmin
-        res.status(200).json(error.message);
-      });
+    layersPromise.then(function () {
+      console.log('done!');
+      res.setHeader('Content-disposition', 'attachment; filename=index.json');
+      res.setHeader('Content-type', 'application/json');
+      res.status(200).json(styles);
+    }).catch(function (error) {
+      console.log(error);
+      // if we do not send status 200, it won't be downloaded and a backup.json file will be downloaded in the OrigoAdmin
+      res.status(200).json(error.message);
+    });
     // });
   });
 module.exports = domainRouter;
