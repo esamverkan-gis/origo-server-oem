@@ -334,7 +334,6 @@ domainRouter.route('/updateTreeStructure')
   })
   .post(function (req, res, next) {
     updateTreeStructure(req, res);
-    res.status(200).send({});
   });
 
 domainRouter.route('/saveVisibilityStatus')
