@@ -12,7 +12,7 @@ var app = express();
 process.chdir(__dirname);
 
 var handlebars = require('express-handlebars')
-    .create({defaultLayout: 'main'});
+    .create({ defaultLayout: 'main' });
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'views'));
@@ -30,13 +30,13 @@ app.use('/mapstate', mapStateRouter);
 // error handlers
 
 // 404 catch-all handler (middleware)
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     res.status(404);
     res.render('404');
 });
 
 // 500 error handler (middleware)
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
     console.error(err.stack);
     res.status(500);
     res.render('500');
@@ -45,13 +45,13 @@ app.use(function(err, req, res, next) {
 var server = app.listen(3001, function () {
     var host = server.address().address
     var port = server.address().port
-  
+
     console.log('Origo server listening at http://%s:%s %s', host, port, new Date())
-  });
+});
 
 process.on('SIGINT', () => {
     console.log('Received SIGINT.  Press Control-D to exit.');
     process.exit();
 });
-  
+
 module.exports = app;
